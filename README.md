@@ -2,7 +2,7 @@
 Blazor Table/Grid/ListView/Whatever you want.
 Not dependent on any CSS framework.
 
-## install
+## Install
 - Add [SmartishTable Nuget]()
 	- dotnet add package SmartishTable
 - Add following to your index.html
