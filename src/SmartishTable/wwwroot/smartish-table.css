@@ -1,0 +1,7 @@
+﻿.smartish-table-sort-desc::before {
+    content: "▼";
+}
+
+.smartish-table-sort-asc::before {
+    content: "▲";
+}

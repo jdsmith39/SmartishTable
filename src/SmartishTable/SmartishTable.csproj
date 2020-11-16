@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Authors>Jeremy Smith</Authors>
+    <Company />
+    <Product />
+    <Description>SmartishTable - Blazor Table/Grid/ListView/Whatever you want.  UI is completely customizable!  Not dependent on any CSS frameworks.  Features:  Paging, Sorting and Filtering</Description>
+    <PackageTags>blazor, table, grid, repeater, datagrid, dataview, listview, itemlist, component, razor</PackageTags>
+    <PackageProjectUrl>https://github.com/jdsmith39/SmartishTable</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jdsmith39/SmartishTable</RepositoryUrl>
+    <Version>0.5.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0" />
+  </ItemGroup>
+  
+</Project>

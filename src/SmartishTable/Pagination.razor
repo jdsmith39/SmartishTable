@@ -1,0 +1,13 @@
+﻿@ChildContent(Paginator)
+
+@code {
+    [CascadingParameter(Name = "SmartishTablePager")]
+    public SmartishTable.Paging.Paginator Paginator { get; set; }
+
+    [Parameter]
+    public RenderFragment<SmartishTable.Paging.Paginator> ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}

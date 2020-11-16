@@ -1,0 +1,9 @@
+﻿@if (!string.IsNullOrEmpty(Root.HeaderTag))
+{
+  @HeaderFragment
+}
+else
+{
+  @ChildContent
+}
+@typeparam TItem

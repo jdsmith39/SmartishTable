@@ -1,0 +1,51 @@
+﻿@page "/"
+@using SmartishTable.Samples.Shared
+@inject HttpClient Http
+
+<h2>SmartishTable Samples - Cards</h2>
+
+@if (list == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <SmartishTable.Root SafeList="list" HeaderTag="div">
+    <div class="form-row">
+      <SmartishTable.Sort TItem="Person" Field="o=>o.LastName" IsDefaultSort="true" Css="col-md-4 canSelect">Last Name</SmartishTable.Sort>
+      <SmartishTable.Sort TItem="Person" Field="o=>o.FirstName" Css="col-md-4 canSelect">First Name</SmartishTable.Sort>
+      <SmartishTable.Sort TItem="Person" Field="o=>o.Email" Css="col-md-4 canSelect">Email</SmartishTable.Sort>
+      <SmartishTable.Repeater TItem="Person" Context="row">
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-2">
+          <div class="card h-100">
+            <div class="card-header">
+              @row.Item.Id @row.Item.FirstName @row.Item.LastName
+            </div>
+            <div class="card-body">
+              <div class="hover">Birth Date: @row.Item.BirthDate.ToShortDateString()</div>
+              <div class="hover">City: @row.Item.City</div>
+              <div class="hover">Company: @row.Item.Company</div>
+              <div class="hover">Country: @row.Item.Country</div>
+              <div class="hover">Dependents: @row.Item.Dependents</div>
+              <div class="hover">Email: @row.Item.Email</div>
+              <div class="hover">Gender: @row.Item.Gender</div>
+              <div class="hover">Income: @row.Item.Income</div>
+              <div class="hover">Active: @row.Item.IsActive</div>
+              <div class="hover">Job Title: @row.Item.JobTitle</div>
+            </div>
+          </div>
+        </div>
+      </SmartishTable.Repeater>
+    </div>
+  </SmartishTable.Root>
+}
+
+@code {
+  private List<Person> list;
+
+  protected override async Task OnInitializedAsync()
+  {
+    list = await Http.GetFromJsonAsync<List<Person>>("People/AFew");
+  }
+
+}

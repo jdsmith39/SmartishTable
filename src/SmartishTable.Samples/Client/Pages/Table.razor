@@ -1,0 +1,226 @@
+﻿@page "/table"
+@using SmartishTable.Samples.Shared
+@inject HttpClient Http
+
+<h2>SmartishTable Samples - Table</h2>
+
+@if (list == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+<SmartishTable.Root SafeList="list" MaxNumberOfSorts="2">
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.LastName" IsDefaultSort="true" Css="canSelect">Last Name</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.FirstName" Css="canSelect">First Name</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.Email" Css="canSelect">Email</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.Gender" Css="canSelect">Gender</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.Dependents" Css="canSelect">Dependents</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.Company" Css="canSelect">Company</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.JobTitle" Css="canSelect">Job Title</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.Country" Css="canSelect">Country</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.City" Css="canSelect">City</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.BirthDate" Css="canSelect">Birth Date</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.Income" Css="canSelect">Income</SmartishTable.Sort>
+        <SmartishTable.Sort TItem="Person" Field="o=>o.IsActive" Css="canSelect">IsActive</SmartishTable.Sort>
+      </tr>
+      <tr>
+        <td>
+          <select @bind="lastNameOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.LastName" Context="filterContext" Operator="lastNameOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="firstNameOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.FirstName" Context="filterContext" Operator="firstNameOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="emailOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.Email" Context="filterContext" Operator="emailOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="genderOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.Gender" Context="filterContext" Operator="genderOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="dependentsOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterNumeric TItem="Person" Field="x=>x.Dependents" Context="filterContext" Operator="dependentsOperator" FilterType="byte?">
+            <input type="number" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterNumeric>
+        </td>
+        <td>
+          <select @bind="companyOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.Company" Context="filterContext" Operator="companyOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="jobTitleOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.JobTitle" Context="filterContext" Operator="jobTitleOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="countryOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.Country" Context="filterContext" Operator="countryOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="cityOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterString TItem="Person" Field="x=>x.City" Context="filterContext" Operator="cityOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterString>
+        </td>
+        <td>
+          <select @bind="birthDateOperator" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.DateTimeOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterDateTime TItem="Person" Field="x=>x.BirthDate" Context="filterContext" Operator="birthDateOperator">
+            <input type="text" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterDateTime>
+        </td>
+        <td>
+          <select @bind="incomeOperator1" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterNumeric TItem="Person" Field="x=>x.Income" Context="filterContext" Operator="incomeOperator1" FilterType="decimal?">
+            <input type="number" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterNumeric>
+          <select @bind="incomeOperator2" class="form-control form-control-sm">
+            @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+            {
+              <option value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterNumeric TItem="Person" Field="x=>x.Income" Context="filterContext" Operator="incomeOperator2" FilterType="decimal?">
+            <input type="number" @bind-value="@filterContext.FilterValue" name="Search" class="form-control form-control-sm" />
+          </SmartishTable.FilterNumeric>
+        </td>
+        <td>
+          <select @bind="activeOperator" class="form-control form-control-sm">
+            <option value="@SmartishTable.Filters.BooleanOperators.Equals">All</option>
+            @foreach (var item in SmartishTable.Filters.BooleanOperators.Equals.GetList().Where(w => ((byte)w) > 8))
+            {
+              <option selected="@(activeOperator == item)" value="@item">@item.GetDisplayName()</option>
+            }
+          </select>
+          <SmartishTable.FilterBoolean TItem="Person" Field="o=>o.IsActive" Operator="activeOperator"></SmartishTable.FilterBoolean>
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <SmartishTable.Repeater TItem="Person" Context="row">
+        <tr>
+          <td>@row.Item.LastName</td>
+          <td>@row.Item.FirstName</td>
+          <td>@row.Item.Email</td>
+          <td>@row.Item.Gender</td>
+          <td>@row.Item.Dependents</td>
+          <td>@row.Item.Company</td>
+          <td>@row.Item.JobTitle</td>
+          <td>@row.Item.Country</td>
+          <td>@row.Item.City</td>
+          <td>@row.Item.BirthDate.ToShortDateString()</td>
+          <td>@row.Item.Income?.ToString("C")</td>
+          <td>@row.Item.IsActive</td>
+        </tr>
+      </SmartishTable.Repeater>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="12">
+          <SmartishTable.Pagination Context="Pager">
+            <SmartishTablePager Paginator="Pager" DefaultPageSize="10"></SmartishTablePager>
+          </SmartishTable.Pagination>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</SmartishTable.Root>
+}
+
+@code {
+    private List<Person> list;
+
+    private SmartishTable.Filters.StringOperators lastNameOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.StringOperators firstNameOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.StringOperators emailOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.StringOperators genderOperator = SmartishTable.Filters.StringOperators.Equals;
+    private SmartishTable.Filters.NumericOperators dependentsOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+    private SmartishTable.Filters.StringOperators companyOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.StringOperators jobTitleOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.StringOperators countryOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.StringOperators cityOperator = SmartishTable.Filters.StringOperators.Contains;
+    private SmartishTable.Filters.DateTimeOperators birthDateOperator = SmartishTable.Filters.DateTimeOperators.Equals;
+    private SmartishTable.Filters.NumericOperators incomeOperator1 = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+    private SmartishTable.Filters.NumericOperators incomeOperator2 = SmartishTable.Filters.NumericOperators.LessThanOrEqual;
+    private SmartishTable.Filters.BooleanOperators? activeOperator = SmartishTable.Filters.BooleanOperators.Equals;
+
+    protected override async Task OnInitializedAsync()
+    {
+      list = await Http.GetFromJsonAsync<List<Person>>("People");
+    }
+
+}
