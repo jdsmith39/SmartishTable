@@ -6,7 +6,7 @@ Not dependent on any CSS framework.
 - Add [SmartishTable Nuget]()
 	- dotnet add package SmartishTable
 - Add following to your index.html
-	- <link href="_content/SmartishTable/smartish-table.css" rel="stylesheet" />
+	- `<link href="_content/SmartishTable/smartish-table.css" rel="stylesheet" />`
 
 ## Dependencies
 - None!
