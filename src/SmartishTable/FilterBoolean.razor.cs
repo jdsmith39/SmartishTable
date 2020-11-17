@@ -79,11 +79,6 @@ namespace SmartishTable
             await Root.Refresh(true);
         }
 
-        //public void Dispose()
-        //{
-        //    
-        //}
-
         public event PropertyChangedEventHandler PropertyChanged;
         public async void RaisePropertyChange(string propertyname)
         {
