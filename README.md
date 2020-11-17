@@ -1,9 +1,12 @@
 # SmartishTable
+[![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/SmartishTable.svg?style=flat-square)](https://www.nuget.org/packages/SmartishTable)
+[![Nuget (with prereleases)](https://img.shields.io/nuget/dt/SmartishTable.svg?style=flat-square)](https://www.nuget.org/packages/SmartishTable)
+
 Blazor Table/Grid/ListView/Whatever you want.
 Not dependent on any CSS framework.
 
 ## Install
-- Add [SmartishTable Nuget]()
+- Add [SmartishTable Nuget](https://www.nuget.org/packages/SmartishTable/)
 	- dotnet add package SmartishTable
 - Add following to your index.html
 	- `<link href="_content/SmartishTable/smartish-table.css" rel="stylesheet" />`
