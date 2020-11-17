@@ -17,7 +17,7 @@ namespace SmartishTable
         [Parameter]
         public List<TItem> SafeList { get; set; }
 
-        internal List<TItem>? DisplayList { get; set; }
+        internal List<TItem> DisplayList { get; set; }
 
         [Parameter]
         public RenderFragment ChildContent { get; set; }
@@ -47,7 +47,7 @@ namespace SmartishTable
         /// Event to listen to when data is updated
         /// </summary>
         [Parameter]
-        public Func<Task>? OnDataUpdated { get; set; }
+        public Func<Task> OnDataUpdated { get; set; }
 
         /// <summary>
         /// Default:  1
@@ -59,6 +59,7 @@ namespace SmartishTable
         internal ColumnSortCollection<TItem> ColumnSorts;
         internal ColumnFilterCollection<TItem> ColumnFilters;
         internal Paginator Paginator;
+        private bool disposedValue;
 
         protected override async Task OnInitializedAsync()
         {
@@ -141,9 +142,23 @@ namespace SmartishTable
             return DisplayList[index];
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Paginator.PropertyChanged -= Paginator_PropertyChanged;
+                }
+
+                disposedValue = true;
+            }
+        }
+
         public void Dispose()
         {
-            Paginator.PropertyChanged -= Paginator_PropertyChanged;
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
