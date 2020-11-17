@@ -85,7 +85,7 @@
       }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
       Paginator.PageSize = DefaultPageSize ?? 10;
       currentPage = Paginator.Page;

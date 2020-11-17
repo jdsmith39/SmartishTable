@@ -34,6 +34,7 @@ namespace SmartishTable
             set { SetProperty(ref _operator, value); }
         }
         private BooleanOperators? _operator = BooleanOperators.Equals;
+        private bool disposedValue;
 
         public FilterContext<bool?> Context { get; private set; }
 
@@ -78,18 +79,10 @@ namespace SmartishTable
             await Root.Refresh(true);
         }
 
-        public void Dispose()
-        {
-            Context.PropertyChanged -= Context_PropertyChanged;
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         public async void RaisePropertyChange(string propertyname)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
             if (propertyname == nameof(Operator) && Root != null)
                 await Root.Refresh();
@@ -101,6 +94,26 @@ namespace SmartishTable
             prop = value;
             this.RaisePropertyChange(propertyName);
             return true;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Context.PropertyChanged -= Context_PropertyChanged;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

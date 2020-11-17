@@ -58,7 +58,7 @@ namespace SmartishTable
             await Root.Refresh(true);
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             if (Root.ColumnSorts == null)
                 Root.ColumnSorts = new ColumnSortCollection<TItem>();
