@@ -9,7 +9,7 @@
     <PackageTags>blazor, table, grid, repeater, datagrid, dataview, listview, itemlist, component, razor</PackageTags>
     <PackageProjectUrl>https://github.com/jdsmith39/SmartishTable</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jdsmith39/SmartishTable</RepositoryUrl>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
