@@ -35,6 +35,20 @@ namespace SmartishTable.Samples.Server.Controllers
             return people.Take(20);
         }
 
+        [HttpGet("AFewMore")]
+        public async Task<IEnumerable<Person>> GetAFewMore()
+        {
+            await RetrievePeople();
+            return people.Skip(10).Take(30);
+        }
+
+        [HttpGet("Some/{count}")]
+        public async Task<IEnumerable<Person>> GetSome(int count)
+        {
+            await RetrievePeople();
+            return people.Take(count);
+        }
+
         private async Task RetrievePeople()
         {
             if (people != null)

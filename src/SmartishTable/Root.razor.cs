@@ -68,6 +68,10 @@ namespace SmartishTable
                page = 1
             };
             Paginator.PropertyChanged += Paginator_PropertyChanged;
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
             await Refresh();
         }
 
