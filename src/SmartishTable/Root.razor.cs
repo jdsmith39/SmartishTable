@@ -117,27 +117,27 @@ namespace SmartishTable
             StateHasChanged();
         }
 
-        public Task AddItem(TItem item)
+        public Task Add(TItem item)
         {
             SafeList.Add(item);
             return Refresh();
         }
 
-        public Task UpdateItem(int index, TItem item)
+        public Task UpdateAt(int index, TItem item)
         {
             var dataIndex = SafeList.IndexOf(DisplayList[index]);
             SafeList[dataIndex] = item;
             return Refresh();
         }
 
-        public Task RemoveItem(int index)
+        public Task RemoveAt(int index)
         {
             var item = DisplayList[index];
             SafeList.Remove(item);
             return Refresh();
         }
 
-        public TItem GetItem(int index)
+        public TItem GetAt(int index)
         {
             return DisplayList[index];
         }
