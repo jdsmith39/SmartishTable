@@ -1,18 +1,23 @@
-﻿@page "/Another"
+﻿@page "/EventBasedUpdates"
 @using SmartishTable.Samples.Shared
 @inject HttpClient Http
 
-<h2>SmartishTable Samples - List Assigned in event</h2>
+<h2 @onclick="(() => StateHasChanged())">SmartishTable Samples - Event Based Table Updates</h2>
 
-<button @onclick="(() => LoadSome(1))">Load 1</button>
-<button @onclick="(() => LoadSome(2))">Load 2</button>
-<button @onclick="(() => LoadSome(3))">Load 3</button>
-<button @onclick="(() => LoadSome(4))">Load 4</button>
-
-@if (list == null)
-{
-  <p><em>Click the button...</em></p>
-}
+<div class="form-group form-row">
+  <label for="count" class="col-form-label">
+    Select List Count
+  </label>
+  <div class="col-sm">
+    <select @bind="counter.Count" id="count" type="text" class="form-control">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
+  </div>
+</div>
 
 <SmartishTable.Root @ref="smartishTable" SafeList="list" HeaderTag="div">
   <div class="form-row">
@@ -47,12 +52,17 @@ Count: @list?.Count
     private List<Person> list;
     private SmartishTable.Root<Person> smartishTable;
 
+    private Counter counter = new Counter();
+
     protected override async Task OnInitializedAsync()
     {
+      counter.PropertyChanged += Count_Changed;
     }
 
-    protected async Task LoadSome(int count)
+    protected async void Count_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      list = await Http.GetFromJsonAsync<List<Person>>($"People/Some/{count}");
+        list = await Http.GetFromJsonAsync<List<Person>>($"People/Some/{counter.Count}");
+        // has to be called, because this is a property changed event, blazor does not known something changed.
+        StateHasChanged();
     }
 }

@@ -7,7 +7,7 @@ namespace SmartishTable.Paging
 {
     public class Paginator : BaseClass
     {
-        internal static List<string> PaginatorPropertiesChangedList = new List<string>() { nameof(Paginator.Page), nameof(Paginator.PageSize) };
+        internal static HashSet<string> PaginatorPropertiesChangedList = new HashSet<string>() { nameof(Paginator.Page), nameof(Paginator.PageSize) };
 
         private int? pageSize;
         public int? PageSize 
