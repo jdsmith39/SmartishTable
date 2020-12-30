@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartishTable", "src\SmartishTable\SmartishTable.csproj", "{B6F986F3-3822-4C12-95E5-0225289F252A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartishTable.Samples.Server", "src\SmartishTable.Samples\Server\SmartishTable.Samples.Server.csproj", "{AF58AFAD-795B-4383-8841-68D0F8526544}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartishTable.Samples.Server", "src\SmartishTable.Samples\Server\SmartishTable.Samples.Server.csproj", "{AF58AFAD-795B-4383-8841-68D0F8526544}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartishTable.Samples.Client", "src\SmartishTable.Samples\Client\SmartishTable.Samples.Client.csproj", "{C1189DDF-A1B5-400C-AE94-2DF06ABD4966}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartishTable.Samples.Client", "src\SmartishTable.Samples\Client\SmartishTable.Samples.Client.csproj", "{C1189DDF-A1B5-400C-AE94-2DF06ABD4966}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartishTable.Samples.Shared", "src\SmartishTable.Samples\Shared\SmartishTable.Samples.Shared.csproj", "{4346EB88-B84A-4A36-B91E-753276EC3DBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartishTable.Samples.Shared", "src\SmartishTable.Samples\Shared\SmartishTable.Samples.Shared.csproj", "{4346EB88-B84A-4A36-B91E-753276EC3DBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartishTable.Tests", "src\SmartishTable.Tests\SmartishTable.Tests.csproj", "{1B2A0A2B-901E-494A-B244-541B2C5F9D85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{4346EB88-B84A-4A36-B91E-753276EC3DBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4346EB88-B84A-4A36-B91E-753276EC3DBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4346EB88-B84A-4A36-B91E-753276EC3DBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B2A0A2B-901E-494A-B244-541B2C5F9D85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B2A0A2B-901E-494A-B244-541B2C5F9D85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B2A0A2B-901E-494A-B244-541B2C5F9D85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B2A0A2B-901E-494A-B244-541B2C5F9D85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
