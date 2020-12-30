@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartishTable.Samples\Server\SmartishTable.Samples.Server.csproj" />
+    <Folder Include="Server\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Server\" />
+    <ProjectReference Include="..\..\src\SmartishTable.Samples\Server\SmartishTable.Samples.Server.csproj" />
   </ItemGroup>
 
 </Project>
