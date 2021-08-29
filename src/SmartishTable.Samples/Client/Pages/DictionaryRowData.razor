@@ -1,0 +1,80 @@
+﻿@page "/DictionaryRowData"
+@inject HttpClient Http
+
+<h2>SmartishTable Samples - Dictionary Row Data</h2>
+
+@if (list == null || keys == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <SmartishTable.Root SafeList="list">
+    @foreach (var item in keys)
+    {
+      <SmartishTable.Sort TItem="Dictionary<string,JsonElement>" Field="o=>o[item]" Css="col-md-4 canSelect" Comparer="jsonElementComparer">@item</SmartishTable.Sort>
+    }
+
+    <SmartishTable.Repeater TItem="Dictionary<string,JsonElement>" Context="row">
+      <tr>
+        @foreach (var item in keys)
+        {
+          <td>@row.Item[item]</td>
+        }
+      </tr>
+    </SmartishTable.Repeater>
+  </SmartishTable.Root>
+  @(System.Text.Json.JsonSerializer.Serialize(list))
+}
+@using System.Text.Json
+@code {
+    private List<Dictionary<string, JsonElement>> list;
+    private List<string> keys;
+    private JsonElementComparer jsonElementComparer = new JsonElementComparer();
+
+    protected override async Task OnInitializedAsync()
+    {
+      list = await Http.GetFromJsonAsync<List<Dictionary<string, JsonElement>>>("People/Some/10");
+      keys = list.First().Keys.ToList();
+    }
+
+    public class JsonElementComparer : IComparer<object?>
+    {
+      public int Compare(object? xx, object? yy)
+      {
+        if (xx == null && yy == null)
+          return 0;
+
+        if (xx == null && yy != null)
+          return 1;
+        if (xx != null && yy == null)
+          return -1;
+
+        var x = (JsonElement?)xx;
+        var y = (JsonElement?)yy;
+
+        switch (x.Value.ValueKind)
+        {
+          case JsonValueKind.Undefined:
+            break;
+          case JsonValueKind.Object:
+            break;
+          case JsonValueKind.Array:
+            break;
+          case JsonValueKind.String:
+            Console.WriteLine($"X={x.Value.GetString()}  Y={y.Value.GetString()}  C={string.Compare(x.Value.GetString(), y.Value.GetString())}");
+            return string.Compare(x.Value.GetString(), y.Value.GetString(), true);
+          case JsonValueKind.Number:
+            
+            break;
+          case JsonValueKind.True:
+            break;
+          case JsonValueKind.False:
+            break;
+          case JsonValueKind.Null:
+            break;
+        }
+        return 0;
+      }
+    }
+}

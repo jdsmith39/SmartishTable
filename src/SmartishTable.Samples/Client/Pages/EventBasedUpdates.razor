@@ -19,7 +19,7 @@
   </div>
 </div>
 
-<SmartishTable.Root @ref="smartishTable" SafeList="list" HeaderTag="div">
+<SmartishTable.Root SafeList="list" HeaderTag="div">
   <div class="form-row">
     <SmartishTable.Sort TItem="Person" Field="o=>o.LastName" IsDefaultSort="true" Css="col-md-4 canSelect">Last Name</SmartishTable.Sort>
     <SmartishTable.Sort TItem="Person" Field="o=>o.FirstName" Css="col-md-4 canSelect">First Name</SmartishTable.Sort>
@@ -50,7 +50,6 @@
 Count: @list?.Count
 @code {
     private List<Person> list;
-    private SmartishTable.Root<Person> smartishTable;
 
     private Counter counter = new Counter();
 
@@ -62,7 +61,7 @@ Count: @list?.Count
     protected async void Count_Changed(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         list = await Http.GetFromJsonAsync<List<Person>>($"People/Some/{counter.Count}");
-        // has to be called, because this is a property changed event, blazor does not known something changed.
+        // has to be called, because this is a property changed event, blazor does not know something changed.
         StateHasChanged();
     }
 }

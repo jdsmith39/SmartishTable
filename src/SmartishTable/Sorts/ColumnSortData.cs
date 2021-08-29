@@ -20,6 +20,8 @@ namespace SmartishTable.Sorts
         [Range(1, int.MaxValue)]
         public int? SortOrder { get; set; }
 
+        public IComparer<object> Comparer { get; set; }
+
         internal void Reset()
         {
             IsDescending = false;
