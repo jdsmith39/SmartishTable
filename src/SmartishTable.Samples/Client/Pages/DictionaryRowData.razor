@@ -5,26 +5,24 @@
 
 @if (list == null || keys == null)
 {
-  <p><em>Loading...</em></p>
+    <p><em>Loading...</em></p>
 }
 else
 {
-  <SmartishTable.Root SafeList="list">
-    @foreach (var item in keys)
-    {
-      <SmartishTable.Sort TItem="Dictionary<string,JsonElement>" Field="o=>o[item]" Css="col-md-4 canSelect" Comparer="jsonElementComparer">@item</SmartishTable.Sort>
-    }
-
-    <SmartishTable.Repeater TItem="Dictionary<string,JsonElement>" Context="row">
-      <tr>
+    <SmartishTable.Root SafeList="list">
         @foreach (var item in keys)
         {
-          <td>@row.Item[item]</td>
+            <SmartishTable.Sort TItem="Dictionary<string,JsonElement>" Field="o=>o[item]" Css="col-md-4 canSelect" Comparer="jsonElementComparer">@item</SmartishTable.Sort>
         }
-      </tr>
-    </SmartishTable.Repeater>
-  </SmartishTable.Root>
-  @(System.Text.Json.JsonSerializer.Serialize(list))
+        <SmartishTable.Repeater TItem="Dictionary<string,JsonElement>" Context="row">
+            <tr>
+                @foreach (var item in keys)
+                {
+                    <td>@row.Item[item]</td>
+                }
+            </tr>
+        </SmartishTable.Repeater>
+    </SmartishTable.Root>
 }
 @using System.Text.Json
 @code {
@@ -34,47 +32,61 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-      list = await Http.GetFromJsonAsync<List<Dictionary<string, JsonElement>>>("People/Some/10");
-      keys = list.First().Keys.ToList();
+        list = await Http.GetFromJsonAsync<List<Dictionary<string, JsonElement>>>("People/Some/10");
+        keys = list.First().Keys.ToList();
     }
 
     public class JsonElementComparer : IComparer<object?>
     {
-      public int Compare(object? xx, object? yy)
-      {
-        if (xx == null && yy == null)
-          return 0;
-
-        if (xx == null && yy != null)
-          return 1;
-        if (xx != null && yy == null)
-          return -1;
-
-        var x = (JsonElement?)xx;
-        var y = (JsonElement?)yy;
-
-        switch (x.Value.ValueKind)
+        public int Compare(object? xx, object? yy)
         {
-          case JsonValueKind.Undefined:
-            break;
-          case JsonValueKind.Object:
-            break;
-          case JsonValueKind.Array:
-            break;
-          case JsonValueKind.String:
-            Console.WriteLine($"X={x.Value.GetString()}  Y={y.Value.GetString()}  C={string.Compare(x.Value.GetString(), y.Value.GetString())}");
-            return string.Compare(x.Value.GetString(), y.Value.GetString(), true);
-          case JsonValueKind.Number:
-            
-            break;
-          case JsonValueKind.True:
-            break;
-          case JsonValueKind.False:
-            break;
-          case JsonValueKind.Null:
-            break;
+            if (xx == null && yy == null)
+                return 0;
+
+            if (xx == null && yy != null)
+                return 1;
+            if (xx != null && yy == null)
+                return -1;
+
+            var x = (JsonElement?)xx;
+            var y = (JsonElement?)yy;
+
+            if (x.Value.ValueKind != JsonValueKind.Null && y.Value.ValueKind == JsonValueKind.Null)
+                return -1;
+
+            switch (x.Value.ValueKind)
+            {
+                case JsonValueKind.Undefined:
+                    break;
+                case JsonValueKind.Object:
+                    break;
+                case JsonValueKind.Array:
+                    break;
+                case JsonValueKind.String:
+                    return string.Compare(x.Value.GetString(), y.Value.GetString(), true);
+                case JsonValueKind.Number:
+                    var xDouble = x.Value.GetDouble();
+                    var yDouble = y.Value.GetDouble();
+                    if (xDouble < yDouble)
+                        return -1;
+                    else if (xDouble > yDouble)
+                        return 1;
+                    return 0;
+                case JsonValueKind.True:
+                case JsonValueKind.False:
+                    var xBool = x.Value.GetBoolean();
+                    var yBool = y.Value.GetBoolean();
+                    if (xBool == yBool)
+                        return 0;
+                    else if (xBool && !yBool)
+                        return 1;
+                    return -1;
+                case JsonValueKind.Null:
+                    if (y.Value.ValueKind == JsonValueKind.Null)
+                        return 0;
+                    return 1;
+            }
+            return 0;
         }
-        return 0;
-      }
     }
 }
