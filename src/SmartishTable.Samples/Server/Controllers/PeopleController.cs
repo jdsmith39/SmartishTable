@@ -15,7 +15,6 @@ namespace SmartishTable.Samples.Server.Controllers
         private readonly ILogger<PeopleController> _logger;
 
         private List<Person> people;
-        private List<Dictionary<string,object>> peopleDictionary;
 
         public PeopleController(ILogger<PeopleController> logger)
         {
@@ -50,28 +49,12 @@ namespace SmartishTable.Samples.Server.Controllers
             return people.Take(count);
         }
 
-        [HttpGet("Dictionary/{count}/{name}")]
-        public async Task<IEnumerable<Dictionary<string, object>>> GetDictionaryOfPeople(int count, string name)
-        {
-            await RetrievePeopleDictionary();
-            var asdf = peopleDictionary.Take(count).OrderBy(o => o[name] as string);
-            return asdf;
-        }
-
         private async Task RetrievePeople()
         {
             if (people != null)
                 return;
             var json = await System.IO.File.ReadAllTextAsync("data.json");
             people = System.Text.Json.JsonSerializer.Deserialize<List<Person>>(json);
-        }
-
-        private async Task RetrievePeopleDictionary()
-        {
-            if (peopleDictionary != null)
-                return;
-            var json = await System.IO.File.ReadAllTextAsync("data.json");
-            peopleDictionary = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string,object>>>(json);
         }
     }
 }
