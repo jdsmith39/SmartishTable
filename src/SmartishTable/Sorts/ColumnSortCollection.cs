@@ -53,16 +53,30 @@ namespace SmartishTable.Sorts
                 if (item.SortOrder == 1)
                 {
                     if (item.IsDescending)
-                        orderedQuery = query.OrderByDescending(item.Field);
+                    {
+                        if (item.Comparer == null)
+                            orderedQuery = query.OrderByDescending(item.Field);
+                        else
+                            orderedQuery = query.OrderByDescending(item.Field, item.Comparer);
+                    }   
                     else
-                        orderedQuery = query.OrderBy(item.Field);
+                    {
+                        if (item.Comparer == null)
+                            orderedQuery = query.OrderBy(item.Field);
+                        else
+                            orderedQuery = query.OrderBy(item.Field, item.Comparer);
+                    }
                 }
                 else
                 {
                     if (item.IsDescending)
+                    {
                         orderedQuery = orderedQuery.ThenByDescending(item.Field);
+                    }
                     else
+                    {
                         orderedQuery = orderedQuery.ThenBy(item.Field);
+                    }
                 }
             }
 

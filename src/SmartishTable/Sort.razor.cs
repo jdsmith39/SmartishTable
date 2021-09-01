@@ -38,6 +38,10 @@ namespace SmartishTable
         [Parameter]
         public string Css { get; set; }
 
+        [Parameter]
+        public IComparer<object> Comparer { get; set; }
+
+        private string key = Guid.NewGuid().ToString();
         private RenderFragment HeaderFragment;
 
         private string SortCss
@@ -46,7 +50,7 @@ namespace SmartishTable
             {
                 if (!Root.UseSortCss) return "";
 
-                return Root.ColumnSorts[Field.ToString()].SortOrder.HasValue ? Root.ColumnSorts[Field.ToString()].IsDescending ? Root.SortDescendingCss : Root.SortAscendingCss : Root.NoSortCss;
+                return Root.ColumnSorts[key].SortOrder.HasValue ? Root.ColumnSorts[key].IsDescending ? Root.SortDescendingCss : Root.SortAscendingCss : Root.NoSortCss;
             }
         }
 
@@ -54,7 +58,7 @@ namespace SmartishTable
 
         private async Task OnSortClick()
         {
-            Root.ColumnSorts.Set(Root.MaxNumberOfSorts, Field.ToString());
+            Root.ColumnSorts.Set(Root.MaxNumberOfSorts, key);
             await Root.Refresh(true);
         }
 
@@ -62,12 +66,12 @@ namespace SmartishTable
         {
             if (Root.ColumnSorts == null)
                 Root.ColumnSorts = new ColumnSortCollection<TItem>();
-            Root.ColumnSorts.Add(Field.ToString(), new ColumnSortData<TItem>() { Field = Field, IsDescending = false, SortOrder = null });
+            Root.ColumnSorts.Add(key, new ColumnSortData<TItem>() { Field = Field, IsDescending = false, SortOrder = null, Comparer = Comparer });
 
             if (IsDefaultSort)
             {
-                Root.ColumnSorts[Field.ToString()].SortOrder = DefaultSorOrder;
-                Root.ColumnSorts[Field.ToString()].IsDescending = StartingSortDescending;
+                Root.ColumnSorts[key].SortOrder = DefaultSorOrder;
+                Root.ColumnSorts[key].IsDescending = StartingSortDescending;
             }
 
             if (!string.IsNullOrWhiteSpace(Root.HeaderTag))
