@@ -2,13 +2,10 @@
 using SmartishTable.Filters;
 using SmartishTable.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartishTable
 {
@@ -36,7 +33,7 @@ namespace SmartishTable
 
         public FilterContext<DateTime?> Context { get; private set; }
 
-        public Expression<Func<TItem, bool>> GetFilter()
+        public virtual Expression<Func<TItem, bool>> GetFilter()
         {
             if (Context.FilterValue == null)
                 return null;
@@ -68,6 +65,7 @@ namespace SmartishTable
 
         protected override void OnInitialized()
         {
+            // **** required for your filter to work ****
             Root.AddFilterComponent(this);
 
             Context = new FilterContext<DateTime?>();

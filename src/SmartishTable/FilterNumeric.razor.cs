@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SmartishTable.Filters;
-using SmartishTable.Helpers;
 using SmartishTable.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartishTable
 {
@@ -22,7 +18,7 @@ namespace SmartishTable
         public Root<TItem> Root { get; set; }
 
         [Parameter]
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
+        public Expression<Func<TItem, object>> Field { get; set; }
 
         /// <summary>
         /// Default: Equals
@@ -37,7 +33,7 @@ namespace SmartishTable
 
         public FilterContext<FilterType> Context { get; private set; }
 
-        public Expression<Func<TItem, bool>> GetFilter()
+        public virtual Expression<Func<TItem, bool>> GetFilter()
         {
             if (Context.FilterValue == null)
                 return null;
@@ -72,6 +68,7 @@ namespace SmartishTable
             if (!typeof(FilterType).IsNumeric())
                 throw new Exception($"{nameof(FilterType)} must be a numeric type.");
 
+            // **** required for your filter to work ****
             Root.AddFilterComponent(this);
 
             Context = new FilterContext<FilterType>();

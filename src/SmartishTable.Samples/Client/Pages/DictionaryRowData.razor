@@ -13,66 +13,69 @@ else
         <table class="table table-condensed table-striped">
             <thead>
                 <tr>
-                 @foreach (var item in keys)
+                    @foreach (var item in keys)
                 {
                     <SmartishTable.Sort TItem="Dictionary<string,JsonElement>" Field="o=>o[item]" Css="col-md-4 canSelect" Comparer="jsonElementComparer">@item</SmartishTable.Sort>
                 }
             </tr>
-             <tr>
+            <tr>
                 @foreach (var item in keys)
                 {
                     <td>
-                   @switch(firstRow[item].ValueKind)
-                    {
-                        case JsonValueKind.Undefined:
-                        case JsonValueKind.Object:
-                        case JsonValueKind.Array:
-                            break;
-                        case JsonValueKind.String:
-                            stringOperators[item] = Filters.StringOperators.Contains;
-                            <text>
-                                <select @bind="stringOperators[item]" class="form-control form-control-sm">
-                                @foreach (var enumItem in SmartishTable.Filters.StringOperators.Equals.GetList())
-                                {
-                                    <option value="@enumItem">@enumItem.GetDisplayName()</option>
-                                }
-                                </select>
-                              <SmartishTable.FilterString TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Context="filterContext" Operator="stringOperators[item]">
-                                <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-                              </SmartishTable.FilterString>
-                            </text>
-                break;
-                        case JsonValueKind.Number:
-                            numericOperators[item] = Filters.NumericOperators.GreaterThanOrEqual;
-                            <text>
-                                <select @bind="numericOperators[item]" class="form-control form-control-sm">
-                                    @foreach (var enumItem in SmartishTable.Filters.NumericOperators.Equals.GetList())
-                                    {
-                                      <option value="@enumItem">@enumItem.GetDisplayName()</option>
-                                    }
-                                  </select>
-                                  <SmartishTable.FilterNumeric TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Context="filterContext" Operator="numericOperators[item]" FilterType="decimal?">
-                                    <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-                                  </SmartishTable.FilterNumeric>
+                        <FilterJsonElementString Context="filterContext" PropertyName="@item">
+                            <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+                        </FilterJsonElementString>
+                       @* @switch (firstRow[item].ValueKind)
+                        {
+                            case JsonValueKind.Undefined:
+                            case JsonValueKind.Object:
+                            case JsonValueKind.Array:
+                                break;
+                            case JsonValueKind.String:
+                                stringOperators[item] = Filters.StringOperators.Contains;
+                                <text>
+                                    <select @bind="stringOperators[item]" class="form-control form-control-sm">
+                                        @foreach (var enumItem in SmartishTable.Filters.StringOperators.Equals.GetList())
+                                        {
+                                            <option value="@enumItem">@enumItem.GetDisplayName()</option>
+                                        }
+                                    </select>
+                                    <SmartishTable.FilterString TItem="Dictionary<string,JsonElement>" Field="x=>x[item].GetString()" Context="filterContext" Operator="stringOperators[item]">
+                                        <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+                                    </SmartishTable.FilterString>
                                 </text>
-                break;
-                        case JsonValueKind.True:
-                        case JsonValueKind.False:
-                            booleanOperators[item] = Filters.BooleanOperators.Equals;
-                            <text>
-                                <select @bind="booleanOperators[item]" class="form-control form-control-sm">
-                                    <option value="@SmartishTable.Filters.BooleanOperators.Equals">All</option>
-                                    @foreach (var enumItem in SmartishTable.Filters.BooleanOperators.Equals.GetList().Where(w => ((byte)w) > 8))
-                                    {
-                                      <option selected="@(booleanOperators[item] == enumItem)" value="@enumItem">@enumItem.GetDisplayName()</option>
-                                    }
-                                  </select>
-                                  <SmartishTable.FilterBoolean TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Operator="booleanOperators[item]"></SmartishTable.FilterBoolean>
-                            </text>
-                            break;
-                        case JsonValueKind.Null:
-                            break;
-                    }
+                                break;
+                            case JsonValueKind.Number:
+                                numericOperators[item] = Filters.NumericOperators.GreaterThanOrEqual;
+                                <text>
+                                    <select @bind="numericOperators[item]" class="form-control form-control-sm">
+                                        @foreach (var enumItem in SmartishTable.Filters.NumericOperators.Equals.GetList())
+                                        {
+                                            <option value="@enumItem">@enumItem.GetDisplayName()</option>
+                                        }
+                                    </select>
+                                    <SmartishTable.FilterNumeric TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Context="filterContext" Operator="numericOperators[item]" FilterType="decimal?">
+                                        <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+                                    </SmartishTable.FilterNumeric>
+                                </text>
+                                break;
+                            case JsonValueKind.True:
+                            case JsonValueKind.False:
+                                booleanOperators[item] = Filters.BooleanOperators.Equals;
+                                <text>
+                                    <select @bind="booleanOperators[item]" class="form-control form-control-sm">
+                                        <option value="@SmartishTable.Filters.BooleanOperators.Equals">All</option>
+                                        @foreach (var enumItem in SmartishTable.Filters.BooleanOperators.Equals.GetList().Where(w => ((byte)w) > 8))
+                                        {
+                                            <option selected="@(booleanOperators[item] == enumItem)" value="@enumItem">@enumItem.GetDisplayName()</option>
+                                        }
+                                    </select>
+                                    <SmartishTable.FilterBoolean TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Operator="booleanOperators[item]"></SmartishTable.FilterBoolean>
+                                </text>
+                                break;
+                            case JsonValueKind.Null:
+                                break;
+                        }*@
                     </td>
                 }
             </tr>
@@ -100,10 +103,12 @@ else
 </SmartishTable.Root>
 }
 @using System.Text.Json
+@using System.Reflection
 @code {
     private List<Dictionary<string, JsonElement>> list;
     private Dictionary<string, JsonElement> firstRow;
     private List<string> keys;
+    private PropertyInfo[] properties;
     private Dictionary<string, SmartishTable.Filters.StringOperators> stringOperators = new Dictionary<string, Filters.StringOperators>();
     private Dictionary<string, SmartishTable.Filters.BooleanOperators> booleanOperators = new Dictionary<string, Filters.BooleanOperators>();
     private Dictionary<string, SmartishTable.Filters.NumericOperators> numericOperators = new Dictionary<string, Filters.NumericOperators>();

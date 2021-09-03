@@ -2,13 +2,9 @@
 using SmartishTable.Filters;
 using SmartishTable.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartishTable
 {
@@ -21,7 +17,7 @@ namespace SmartishTable
         public Root<TItem> Root { get; set; }
 
         [Parameter]
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
+        public Expression<Func<TItem, object>> Field { get; set; }
 
         /// <summary>
         /// Default: Contains
@@ -36,12 +32,14 @@ namespace SmartishTable
 
         public FilterContext<string> Context { get; private set; }
 
-        public Expression<Func<TItem, bool>> GetFilter()
+        public virtual Expression<Func<TItem, bool>> GetFilter()
         {
             if (string.IsNullOrEmpty(Context.FilterValue))
                 return null;
 
+            var typesInTItem = typeof(TItem).GenericTypeArguments;
             var param = Expression.Parameter(typeof(TItem), "w");
+
             var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
             var filterParam = Expression.Constant(Context.FilterValue);
             switch (Operator)
@@ -62,6 +60,7 @@ namespace SmartishTable
 
         protected override void OnInitialized()
         {
+            // **** required for your filter to work ****
             Root.AddFilterComponent(this);
 
             Context = new FilterContext<string>();
