@@ -37,7 +37,6 @@ namespace SmartishTable
             if (string.IsNullOrEmpty(Context.FilterValue))
                 return null;
 
-            var typesInTItem = typeof(TItem).GenericTypeArguments;
             var param = Expression.Parameter(typeof(TItem), "w");
 
             var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));

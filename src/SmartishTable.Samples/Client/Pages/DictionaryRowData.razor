@@ -22,10 +22,8 @@ else
                 @foreach (var item in keys)
                 {
                     <td>
-                        <FilterJsonElementString Context="filterContext" PropertyName="@item">
-                            <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-                        </FilterJsonElementString>
-                       @* @switch (firstRow[item].ValueKind)
+
+                        @switch (firstRow[item].ValueKind)
                         {
                             case JsonValueKind.Undefined:
                             case JsonValueKind.Object:
@@ -40,9 +38,9 @@ else
                                             <option value="@enumItem">@enumItem.GetDisplayName()</option>
                                         }
                                     </select>
-                                    <SmartishTable.FilterString TItem="Dictionary<string,JsonElement>" Field="x=>x[item].GetString()" Context="filterContext" Operator="stringOperators[item]">
+                                    <FilterJsonElementString Context="filterContext" PropertyName="@item" Operator="stringOperators[item]">
                                         <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-                                    </SmartishTable.FilterString>
+                                    </FilterJsonElementString>
                                 </text>
                                 break;
                             case JsonValueKind.Number:
@@ -54,9 +52,9 @@ else
                                             <option value="@enumItem">@enumItem.GetDisplayName()</option>
                                         }
                                     </select>
-                                    <SmartishTable.FilterNumeric TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Context="filterContext" Operator="numericOperators[item]" FilterType="decimal?">
+                                    <FilterJsonElementNumeric PropertyName="@item" Context="filterContext" Operator="numericOperators[item]" FilterType="decimal?">
                                         <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-                                    </SmartishTable.FilterNumeric>
+                                    </FilterJsonElementNumeric>
                                 </text>
                                 break;
                             case JsonValueKind.True:
@@ -75,7 +73,7 @@ else
                                 break;
                             case JsonValueKind.Null:
                                 break;
-                        }*@
+                        }
                     </td>
                 }
             </tr>

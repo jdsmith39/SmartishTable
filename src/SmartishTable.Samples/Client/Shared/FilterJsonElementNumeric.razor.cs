@@ -10,10 +10,10 @@ using System.Text.Json;
 
 namespace SmartishTable.Samples.Client.Shared
 {
-    public partial class FilterJsonElementString : INotifyPropertyChanged, IFilter<Dictionary<string, JsonElement>>, IDisposable
+    public partial class FilterJsonElementNumeric<FilterType> : INotifyPropertyChanged, IFilter<Dictionary<string, JsonElement>>, IDisposable
     {
         [Parameter]
-        public RenderFragment<FilterContext<string>> ChildContent { get; set; }
+        public RenderFragment<FilterContext<FilterType>> ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
         public Root<Dictionary<string, JsonElement>> Root { get; set; }
@@ -22,15 +22,15 @@ namespace SmartishTable.Samples.Client.Shared
         public string PropertyName { get; set; }
 
         /// <summary>
-        /// Default: Contains
+        /// Default: "="
         /// </summary>
         [Parameter]
-        public StringOperators Operator
+        public NumericOperators Operator
         {
             get { return _operator; }
             set { SetProperty(ref _operator, value); }
         }
-        private StringOperators _operator = StringOperators.Contains;
+        private NumericOperators _operator = NumericOperators.Equals;
 
         public FilterContext<string> Context { get; private set; }
 
@@ -41,16 +41,14 @@ namespace SmartishTable.Samples.Client.Shared
 
             switch (Operator)
             {
-                case StringOperators.Contains:
+                case NumericOperators.Equals:
                     return x => x[PropertyName].GetString().Contains(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
-                case StringOperators.StartsWith:
-                    return x => x[PropertyName].GetString().StartsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
-                case StringOperators.EndsWith:
-                    return x => x[PropertyName].GetString().EndsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
-                case StringOperators.Equals:
-                    return x => x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
-                case StringOperators.NotEquals:
-                    return x => !x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                case NumericOperators.NotEquals:
+                case NumericOperators.GreaterThan:
+                case NumericOperators.GreaterThanOrEqual:
+                case NumericOperators.LessThan:
+                case NumericOperators.LessThanOrEqual:
+                    break;
             }
 
             return null;

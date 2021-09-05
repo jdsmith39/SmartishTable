@@ -44,7 +44,6 @@ namespace SmartishTable
             var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
             var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
             var filterParam = Expression.Constant(value);
-            var nullExpression = Expression.Constant(null);
             switch (Operator)
             {
                 case NumericOperators.Equals:
