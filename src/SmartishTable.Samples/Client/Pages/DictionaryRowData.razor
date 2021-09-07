@@ -103,12 +103,10 @@ else
 </SmartishTable.Root>
 }
 @using System.Text.Json
-@using System.Reflection
 @code {
     private List<Dictionary<string, JsonElement>> list;
     private Dictionary<string, JsonElement> firstRow;
     private List<string> keys;
-    private PropertyInfo[] properties;
     private Dictionary<string, SmartishTable.Filters.StringOperators> stringOperators = new Dictionary<string, Filters.StringOperators>();
     private Dictionary<string, SmartishTable.Filters.BooleanOperators> booleanOperators = new Dictionary<string, Filters.BooleanOperators>();
     private Dictionary<string, SmartishTable.Filters.NumericOperators> numericOperators = new Dictionary<string, Filters.NumericOperators>();
