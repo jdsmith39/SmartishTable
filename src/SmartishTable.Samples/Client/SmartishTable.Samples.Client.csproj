@@ -14,14 +14,4 @@
     <ProjectReference Include="..\..\SmartishTable\SmartishTable.csproj" />
     <ProjectReference Include="..\Shared\SmartishTable.Samples.Shared.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Shared\FilterJsonElementString - Copy - Copy.razor.cs">
-      <DependentUpon>FilterJsonElementString - Copy.razor.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Shared\FilterJsonElementString - Copy.razor.cs">
-      <DependentUpon>FilterJsonElementString.razor.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
 </Project>
