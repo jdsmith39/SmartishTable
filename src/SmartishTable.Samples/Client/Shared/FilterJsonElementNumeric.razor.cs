@@ -10,10 +10,10 @@ using System.Text.Json;
 
 namespace SmartishTable.Samples.Client.Shared
 {
-    public partial class FilterJsonElementNumeric<FilterType> : INotifyPropertyChanged, IFilter<Dictionary<string, JsonElement>>, IDisposable
+    public partial class FilterJsonElementNumeric: INotifyPropertyChanged, IFilter<Dictionary<string, JsonElement>>, IDisposable
     {
         [Parameter]
-        public RenderFragment<FilterContext<FilterType>> ChildContent { get; set; }
+        public RenderFragment<FilterContext<double?>> ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
         public Root<Dictionary<string, JsonElement>> Root { get; set; }
@@ -32,23 +32,27 @@ namespace SmartishTable.Samples.Client.Shared
         }
         private NumericOperators _operator = NumericOperators.Equals;
 
-        public FilterContext<string> Context { get; private set; }
+        public FilterContext<double?> Context { get; private set; }
 
-        public virtual Expression<Func<Dictionary<string, JsonElement>, bool>> GetFilter()
+        public Expression<Func<Dictionary<string, JsonElement>, bool>> GetFilter()
         {
-            if (string.IsNullOrEmpty(Context.FilterValue))
+            if (Context.FilterValue == null)
                 return null;
 
             switch (Operator)
             {
                 case NumericOperators.Equals:
-                    return x => x[PropertyName].GetString().Contains(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.Number ? x[PropertyName].GetDouble().Equals(Context.FilterValue) : false;
                 case NumericOperators.NotEquals:
+                    return x => x[PropertyName].ValueKind == JsonValueKind.Number ? !x[PropertyName].GetDouble().Equals(Context.FilterValue) : false;
                 case NumericOperators.GreaterThan:
+                    return x => x[PropertyName].ValueKind == JsonValueKind.Number ? x[PropertyName].GetDouble() > Context.FilterValue : false;
                 case NumericOperators.GreaterThanOrEqual:
+                    return x => x[PropertyName].ValueKind == JsonValueKind.Number ? x[PropertyName].GetDouble() >= Context.FilterValue : false;
                 case NumericOperators.LessThan:
+                    return x => x[PropertyName].ValueKind == JsonValueKind.Number ? x[PropertyName].GetDouble() < Context.FilterValue : false;
                 case NumericOperators.LessThanOrEqual:
-                    break;
+                    return x => x[PropertyName].ValueKind == JsonValueKind.Number ? x[PropertyName].GetDouble() <= Context.FilterValue : false;
             }
 
             return null;
@@ -59,7 +63,7 @@ namespace SmartishTable.Samples.Client.Shared
             // **** required for your filter to work ****
             Root.AddFilterComponent(this);
 
-            Context = new FilterContext<string>();
+            Context = new FilterContext<double?>();
             Context.PropertyChanged += Context_PropertyChanged;
         }
 

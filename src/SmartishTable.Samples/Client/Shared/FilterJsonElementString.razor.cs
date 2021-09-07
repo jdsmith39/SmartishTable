@@ -34,7 +34,7 @@ namespace SmartishTable.Samples.Client.Shared
 
         public FilterContext<string> Context { get; private set; }
 
-        public virtual Expression<Func<Dictionary<string, JsonElement>, bool>> GetFilter()
+        public Expression<Func<Dictionary<string,JsonElement>, bool>> GetFilter()
         {
             if (string.IsNullOrEmpty(Context.FilterValue))
                 return null;
@@ -42,15 +42,15 @@ namespace SmartishTable.Samples.Client.Shared
             switch (Operator)
             {
                 case StringOperators.Contains:
-                    return x => x[PropertyName].GetString().Contains(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().Contains(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.StartsWith:
-                    return x => x[PropertyName].GetString().StartsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().StartsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.EndsWith:
-                    return x => x[PropertyName].GetString().EndsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().EndsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.Equals:
-                    return x => x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.NotEquals:
-                    return x => !x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? !x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
             }
 
             return null;

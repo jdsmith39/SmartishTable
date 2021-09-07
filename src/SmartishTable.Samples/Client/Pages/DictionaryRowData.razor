@@ -28,9 +28,11 @@ else
                             case JsonValueKind.Undefined:
                             case JsonValueKind.Object:
                             case JsonValueKind.Array:
+                            case JsonValueKind.Null:
                                 break;
                             case JsonValueKind.String:
-                                stringOperators[item] = Filters.StringOperators.Contains;
+                                if (!stringOperators.ContainsKey(item))
+                                    stringOperators[item] = Filters.StringOperators.Contains;
                                 <text>
                                     <select @bind="stringOperators[item]" class="form-control form-control-sm">
                                         @foreach (var enumItem in SmartishTable.Filters.StringOperators.Equals.GetList())
@@ -44,7 +46,8 @@ else
                                 </text>
                                 break;
                             case JsonValueKind.Number:
-                                numericOperators[item] = Filters.NumericOperators.GreaterThanOrEqual;
+                                if (!numericOperators.ContainsKey(item))
+                                    numericOperators[item] = Filters.NumericOperators.GreaterThanOrEqual;
                                 <text>
                                     <select @bind="numericOperators[item]" class="form-control form-control-sm">
                                         @foreach (var enumItem in SmartishTable.Filters.NumericOperators.Equals.GetList())
@@ -52,14 +55,15 @@ else
                                             <option value="@enumItem">@enumItem.GetDisplayName()</option>
                                         }
                                     </select>
-                                    <FilterJsonElementNumeric PropertyName="@item" Context="filterContext" Operator="numericOperators[item]" FilterType="decimal?">
+                                    <FilterJsonElementNumeric PropertyName="@item" Context="filterContext" Operator="numericOperators[item]">
                                         <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
                                     </FilterJsonElementNumeric>
                                 </text>
                                 break;
                             case JsonValueKind.True:
                             case JsonValueKind.False:
-                                booleanOperators[item] = Filters.BooleanOperators.Equals;
+                                if (!booleanOperators.ContainsKey(item))
+                                    booleanOperators[item] = Filters.BooleanOperators.Equals;
                                 <text>
                                     <select @bind="booleanOperators[item]" class="form-control form-control-sm">
                                         <option value="@SmartishTable.Filters.BooleanOperators.Equals">All</option>
@@ -68,10 +72,8 @@ else
                                             <option selected="@(booleanOperators[item] == enumItem)" value="@enumItem">@enumItem.GetDisplayName()</option>
                                         }
                                     </select>
-                                    <SmartishTable.FilterBoolean TItem="Dictionary<string,JsonElement>" Field="x=>x[item]" Operator="booleanOperators[item]"></SmartishTable.FilterBoolean>
+                                    <FilterJsonElementBoolean PropertyName="@item" Operator="booleanOperators[item]"></FilterJsonElementBoolean>
                                 </text>
-                                break;
-                            case JsonValueKind.Null:
                                 break;
                         }
                     </td>
@@ -90,7 +92,7 @@ else
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="12">
+                <td colspan="@keys.Count">
                     <SmartishTable.Pagination Context="Pager">
                         <SmartishTablePager Paginator="Pager" DefaultPageSize="10"></SmartishTablePager>
                     </SmartishTable.Pagination>
@@ -114,7 +116,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        list = await Http.GetFromJsonAsync<List<Dictionary<string, JsonElement>>>("People/Some/50");
+        list = await Http.GetFromJsonAsync<List<Dictionary<string, JsonElement>>>("People/Some/100");
         firstRow = list.FirstOrDefault();
         keys = firstRow?.Keys?.ToList();
     }
