@@ -2,24 +2,25 @@
 using SmartishTable.Filters;
 using SmartishTable.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
-namespace SmartishTable
+namespace SmartishTable.Samples.Client.Shared
 {
-    public partial class FilterBoolean<TItem> : INotifyPropertyChanged, IFilter<TItem>, IDisposable
+    public partial class FilterJsonElementBoolean : INotifyPropertyChanged, IFilter<Dictionary<string, JsonElement>>, IDisposable
     {
         [Parameter]
         public RenderFragment<FilterContext<bool?>> ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
-        public Root<TItem> Root { get; set; }
+        public Root<Dictionary<string, JsonElement>> Root { get; set; }
 
         [Parameter]
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
+        public string PropertyName { get; set; }
 
         /// <summary>
         /// Default: Equals
@@ -35,30 +36,18 @@ namespace SmartishTable
 
         public FilterContext<bool?> Context { get; private set; }
 
-        public virtual Expression<Func<TItem, bool>> GetFilter()
+        public Expression<Func<Dictionary<string, JsonElement>, bool>> GetFilter()
         {
             var operatorsThatRequireFilterValue = new[] { BooleanOperators.Equals, BooleanOperators.NotEquals };
             if (Context.FilterValue == null && (!Operator.HasValue || operatorsThatRequireFilterValue.Contains(Operator.Value)))
                 return null;
 
-            var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
-            var param = Expression.Parameter(typeof(TItem), "w");
-            var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
-            var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
             switch (Operator)
             {
-                case BooleanOperators.Equals:
-                case BooleanOperators.NotEquals:
-                    var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
-                    var filterParam = Expression.Constant(value);
-                    if (Operator == BooleanOperators.Equals)
-                        return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), param);
-                    else
-                        return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), param);
                 case BooleanOperators.IsTrue:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsTrue(filterPropertyConverted)), param);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.True;
                 case BooleanOperators.IsFalse:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsFalse(filterPropertyConverted)), param);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.False;
             }
             return null;
         }

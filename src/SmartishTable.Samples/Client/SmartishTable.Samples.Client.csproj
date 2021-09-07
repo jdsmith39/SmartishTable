@@ -14,5 +14,4 @@
     <ProjectReference Include="..\..\SmartishTable\SmartishTable.csproj" />
     <ProjectReference Include="..\Shared\SmartishTable.Samples.Shared.csproj" />
   </ItemGroup>
-
 </Project>

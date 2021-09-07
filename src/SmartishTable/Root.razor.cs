@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SmartishTable
@@ -61,7 +60,7 @@ namespace SmartishTable
         internal Paginator Paginator;
         private bool disposedValue;
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             Paginator = new Paginator()
             { 

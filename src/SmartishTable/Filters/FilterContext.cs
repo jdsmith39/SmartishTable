@@ -1,5 +1,4 @@
 ﻿using SmartishTable.Helpers;
-using System.ComponentModel;
 
 namespace SmartishTable.Filters
 {

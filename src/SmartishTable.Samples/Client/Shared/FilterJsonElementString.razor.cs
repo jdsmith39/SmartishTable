@@ -2,22 +2,24 @@
 using SmartishTable.Filters;
 using SmartishTable.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
-namespace SmartishTable
+namespace SmartishTable.Samples.Client.Shared
 {
-    public partial class FilterString<TItem> : INotifyPropertyChanged, IFilter<TItem>, IDisposable
+    public partial class FilterJsonElementString : INotifyPropertyChanged, IFilter<Dictionary<string, JsonElement>>, IDisposable
     {
         [Parameter]
         public RenderFragment<FilterContext<string>> ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
-        public Root<TItem> Root { get; set; }
+        public Root<Dictionary<string, JsonElement>> Root { get; set; }
 
         [Parameter]
-        public Expression<Func<TItem, object>> Field { get; set; }
+        public string PropertyName { get; set; }
 
         /// <summary>
         /// Default: Contains
@@ -32,28 +34,25 @@ namespace SmartishTable
 
         public FilterContext<string> Context { get; private set; }
 
-        public virtual Expression<Func<TItem, bool>> GetFilter()
+        public Expression<Func<Dictionary<string,JsonElement>, bool>> GetFilter()
         {
             if (string.IsNullOrEmpty(Context.FilterValue))
                 return null;
 
-            var param = Expression.Parameter(typeof(TItem), "w");
-
-            var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
-            var filterParam = Expression.Constant(Context.FilterValue);
             switch (Operator)
             {
                 case StringOperators.Contains:
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().Contains(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.StartsWith:
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().StartsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.EndsWith:
-                    var method = typeof(string).GetMethod(Operator.ToString(), new[] { typeof(string), typeof(StringComparison) });
-                    var call = Expression.Call(filterProperty, method, filterParam, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), call), param);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().EndsWith(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.Equals:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterProperty, filterParam)), param);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
                 case StringOperators.NotEquals:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterProperty, filterParam)), param);
+                    return x => x[PropertyName].ValueKind == JsonValueKind.String ? !x[PropertyName].GetString().Equals(Context.FilterValue, StringComparison.InvariantCultureIgnoreCase) : false;
             }
+
             return null;
         }
 
@@ -66,7 +65,7 @@ namespace SmartishTable
             Context.PropertyChanged += Context_PropertyChanged;
         }
 
-        private async void Context_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private async void Context_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             await Root.Refresh(true);
         }
@@ -84,7 +83,7 @@ namespace SmartishTable
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
             }
 
-            if (propertyname == nameof(Operator) && Root != null)
+            if (Root != null)
                 await Root.Refresh();
         }
 
