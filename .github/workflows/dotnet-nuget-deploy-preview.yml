@@ -30,7 +30,7 @@ jobs:
         xml-file: './src/SmartishTable/SmartishTable.csproj'
         xpath: '//Project//PropertyGroup//Version'
     - name: Set VERSION variable from tag
-      run: echo "VERSION='${{steps.getxml.outputs.info}}-beta${{steps.date.outputs.date}}'" >> $GITHUB_ENV
+      run: echo "VERSION='${{steps.getxml.outputs.info}}-beta.${{steps.date.outputs.date}}'" >> $GITHUB_ENV
     - name: Echo Version
       run: echo "${VERSION}"
     - name: Setup .NET Core
