@@ -23,7 +23,7 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +%Y-%m-%d)"
     - name: test date
-      run: echo "${steps.date.outputs.date}"
+      run: echo "${{steps.date.outputs.date}}"
     - uses: actions/checkout@v2
     - name: getxml
       id: getxml
