@@ -23,7 +23,7 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +%Y-%m-%d)"
     - name: test date
-      run: echo ""
+      run: echo "${steps.date.outputs.date}"
     - uses: actions/checkout@v2
     - name: getxml
       id: getxml
@@ -32,7 +32,7 @@ jobs:
         xml-file: './src/SmartishTable/SmartishTable.csproj'
         xpath: '//Project//PropertyGroup//Version'
     - name: Set VERSION variable from tag
-      run: echo "VERSION='${steps.getxml.outputs.info}-preview-${steps.date.outputs.date}'"
+      run: echo "VERSION='${{steps.getxml.outputs.info}}-preview-${{steps.date.outputs.date}}'"
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
