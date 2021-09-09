@@ -9,6 +9,9 @@ on:
       - '**/*.gitignore'
       - '**/*.gitattributes'
 
+env: 
+    NUGET_KEY: ${{ secrets.NUGET_API_KEY }}
+
 jobs:
   build:
 
@@ -26,8 +29,6 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
-    - name: Publish SmartishTable
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-          PROJECT_FILE_PATH: src/SmartishTable/SmartishTable.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    - name: Push
+      run: dotnet nuget push SmartishTable.*.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
+

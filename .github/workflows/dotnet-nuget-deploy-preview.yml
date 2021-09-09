@@ -47,7 +47,3 @@ jobs:
       run: dotnet pack --configuration Release /p:Version=$VERSION src/SmartishTable/SmartishTable.csproj --output .
     - name: Push
       run: dotnet nuget push SmartishTable.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
-      #uses: brandedoutcast/publish-nuget@v2.5.2
-      #with:
-      #    PROJECT_FILE_PATH: src/SmartishTable/SmartishTable.csproj
-      #    NUGET_KEY: ${{secrets.NUGET_API_KEY}}
