@@ -1,4 +1,4 @@
-name: Deploy
+name: NuGet-Deploy
 
 on:
   workflow_dispatch:
