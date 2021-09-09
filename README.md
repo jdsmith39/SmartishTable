@@ -14,6 +14,7 @@ Not dependent on any CSS framework.
 - None!
 
 ## Features
+- Now includes an exmaple of adding custom filters and dynamic columns using a dictionary
 - Fully customizable UI
 	- No UI framework dependency
 - Paging
