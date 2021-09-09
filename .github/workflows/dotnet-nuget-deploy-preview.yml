@@ -26,9 +26,9 @@ jobs:
     - name: getxml
       id: getxml
       uses: mavrosxristoforos/get-xml-info@1.0
-        with:
-            xml-file: 'SmartishTable.csproj'
-            xpath: '//Project//PropertyGroup//Version'
+      with:
+        xml-file: 'SmartishTable.csproj'
+        xpath: '//Project//PropertyGroup//Version'
     - name: Set VERSION variable from tag
       run: echo "VERSION=${{steps.getxml.outputs.info-preview-steps.date.outputs.date}}"
     - name: Setup .NET Core
