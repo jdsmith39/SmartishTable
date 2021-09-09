@@ -2,8 +2,8 @@ name: NuGet-Deploy-Preview
 
 on:
   workflow_dispatch:
-    tags:
-    - "v[0-9]+.[0-9]+.[0-9]+-preview[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]"
+    branches:
+      - develop
     paths-ignore:
       - '**/*.md'
       - '**/*.gitignore'
@@ -12,15 +12,25 @@ on:
 env: 
     NUGET_KEY: ${{ secrets.NUGET_API_KEY }}
 
+
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +%Y-%m-%d)"
     - uses: actions/checkout@v2
+    - name: getxml
+      id: getxml
+      uses: mavrosxristoforos/get-xml-info@1.0
+        with:
+            xml-file: 'SmartishTable.csproj'
+            xpath: '//Project//PropertyGroup//Version'
     - name: Set VERSION variable from tag
-      run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      run: echo "VERSION=${{steps.getxml.outputs.info-preview-steps.date.outputs.date}}"
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -32,7 +42,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Pack
-      run: dotnet pack --configuration Release /p:Version=${VERSION} --output .
+      run: dotnet pack --configuration Release /p:Version=$VERSION --output .
     - name: Push
       run: dotnet nuget push SmartishTable.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
       #uses: brandedoutcast/publish-nuget@v2.5.2
