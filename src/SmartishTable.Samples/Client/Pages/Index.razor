@@ -12,10 +12,10 @@ else
 {
   <SmartishTable.Root SafeList="list" HeaderTag="div">
     <div class="form-row">
-      <SmartishTable.Sort TItem="Person" Field="o=>o.LastName" IsDefaultSort="true" Css="col-md-4 canSelect">Last Name</SmartishTable.Sort>
-      <SmartishTable.Sort TItem="Person" Field="o=>o.FirstName" Css="col-md-4 canSelect">First Name</SmartishTable.Sort>
-      <SmartishTable.Sort TItem="Person" Field="o=>o.Email" Css="col-md-4 canSelect">Email</SmartishTable.Sort>
-      <SmartishTable.Repeater TItem="Person" Context="row">
+      <SmartishTable.Sort Field="o=>o.LastName" IsDefaultSort="true" Css="col-md-4 canSelect">Last Name</SmartishTable.Sort>
+      <SmartishTable.Sort Field="o=>o.FirstName" Css="col-md-4 canSelect">First Name</SmartishTable.Sort>
+      <SmartishTable.Sort Field="o=>o.Email" Css="col-md-4 canSelect">Email</SmartishTable.Sort>
+      <SmartishTable.Repeater Context="row">
         <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-2">
           <div class="card h-100">
             <div class="card-header">

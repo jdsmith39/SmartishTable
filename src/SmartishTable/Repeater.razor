@@ -11,17 +11,17 @@
   }
 }
 
-@typeparam TItem
+@typeparam SmartishTItem
 @code {
     [CascadingParameter(Name = "SmartishTableRoot")]
-    public Root<TItem> Root { get; set; }
+    public Root<SmartishTItem> Root { get; set; }
 
     [Parameter]
     public RenderFragment<RepeaterContext> ChildContent { get; set; }
 
     public class RepeaterContext
     {
-      public TItem Item { get; set; }
+      public SmartishTItem Item { get; set; }
       public int Index { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace SmartishTable.Filters
 {
-    internal class ColumnFilterCollection<TItem> : List<IFilter<TItem>>
+    internal class ColumnFilterCollection<SmartishTItem> : List<IFilter<SmartishTItem>>
     {
-        internal IQueryable<TItem> SetFilters(IQueryable<TItem> query)
+        internal IQueryable<SmartishTItem> SetFilters(IQueryable<SmartishTItem> query)
         {
             foreach (var item in this)
             {

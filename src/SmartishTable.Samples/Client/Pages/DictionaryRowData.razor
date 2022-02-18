@@ -15,7 +15,7 @@ else
                 <tr>
                     @foreach (var item in keys)
                 {
-                    <SmartishTable.Sort TItem="Dictionary<string,JsonElement>" Field="o=>o[item]" Css="col-md-4 canSelect" Comparer="jsonElementComparer">@item</SmartishTable.Sort>
+                    <SmartishTable.Sort Field="o=>o[item]" Css="col-md-4 canSelect" Comparer="jsonElementComparer">@item</SmartishTable.Sort>
                 }
             </tr>
             <tr>
@@ -81,7 +81,7 @@ else
             </tr>
         </thead>
         <tbody>
-            <SmartishTable.Repeater TItem="Dictionary<string,JsonElement>" Context="row">
+            <SmartishTable.Repeater Context="row">
                 <tr>
                     @foreach (var item in keys)
                     {

@@ -3,8 +3,8 @@ using System.Linq.Expressions;
 
 namespace SmartishTable.Interfaces
 {
-    public interface IFilter<TItem>
+    public interface IFilter<SmartishTItem>
     {
-        Expression<Func<TItem, bool>> GetFilter();
+        Expression<Func<SmartishTItem, bool>> GetFilter();
     }
 }

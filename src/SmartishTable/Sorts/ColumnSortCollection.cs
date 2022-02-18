@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SmartishTable.Sorts
 {
-    internal class ColumnSortCollection<TItem> : Dictionary<string, ColumnSortData<TItem>>
+    internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSortData<SmartishTItem>>
     {
         internal void Set(int maxNumberOfSorts, string field)
         {
@@ -44,10 +44,10 @@ namespace SmartishTable.Sorts
             }
         }
 
-        internal IQueryable<TItem> SetOrderBys(IQueryable<TItem> query)
+        internal IQueryable<SmartishTItem> SetOrderBys(IQueryable<SmartishTItem> query)
         {
             var sortColumns = this.Values.Where(w => w.SortOrder.HasValue).OrderBy(o => o.SortOrder);
-            IOrderedQueryable<TItem> orderedQuery = null;
+            IOrderedQueryable<SmartishTItem> orderedQuery = null;
             foreach (var item in sortColumns)
             {
                 if (item.SortOrder == 1)

@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SmartishTable.Sorts
 {
-    internal class ColumnSortData<TItem>
+    internal class ColumnSortData<SmartishTItem>
     {
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
+        public System.Linq.Expressions.Expression<Func<SmartishTItem, object>> Field { get; set; }
         
         public bool IsDescending { get; set; }
 

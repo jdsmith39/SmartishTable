@@ -10,16 +10,16 @@ using System.Runtime.CompilerServices;
 
 namespace SmartishTable
 {
-    public partial class FilterBoolean<TItem> : INotifyPropertyChanged, IFilter<TItem>, IDisposable
+    public partial class FilterBoolean<SmartishTItem> : INotifyPropertyChanged, IFilter<SmartishTItem>, IDisposable
     {
         [Parameter]
         public RenderFragment<FilterContext<bool?>> ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
-        public Root<TItem> Root { get; set; }
+        public Root<SmartishTItem> Root { get; set; }
 
         [Parameter]
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
+        public System.Linq.Expressions.Expression<Func<SmartishTItem, object>> Field { get; set; }
 
         /// <summary>
         /// Default: Equals
@@ -35,14 +35,14 @@ namespace SmartishTable
 
         public FilterContext<bool?> Context { get; private set; }
 
-        public virtual Expression<Func<TItem, bool>> GetFilter()
+        public virtual Expression<Func<SmartishTItem, bool>> GetFilter()
         {
             var operatorsThatRequireFilterValue = new[] { BooleanOperators.Equals, BooleanOperators.NotEquals };
             if (Context.FilterValue == null && (!Operator.HasValue || operatorsThatRequireFilterValue.Contains(Operator.Value)))
                 return null;
 
             var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
-            var param = Expression.Parameter(typeof(TItem), "w");
+            var param = Expression.Parameter(typeof(SmartishTItem), "w");
             var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
             var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
             switch (Operator)
@@ -52,13 +52,13 @@ namespace SmartishTable
                     var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
                     var filterParam = Expression.Constant(value);
                     if (Operator == BooleanOperators.Equals)
-                        return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), param);
+                        return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), param);
                     else
-                        return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), param);
+                        return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), param);
                 case BooleanOperators.IsTrue:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsTrue(filterPropertyConverted)), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsTrue(filterPropertyConverted)), param);
                 case BooleanOperators.IsFalse:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsFalse(filterPropertyConverted)), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsFalse(filterPropertyConverted)), param);
             }
             return null;
         }
