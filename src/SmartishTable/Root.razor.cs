@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace SmartishTable
 {
-    public partial class Root<TItem> : IDisposable
+    public partial class Root<SmartishTItem> : IDisposable
     {
         [Parameter]
-        public List<TItem> SafeList { get; set; }
+        public List<SmartishTItem> SafeList { get; set; }
 
-        internal List<TItem> DisplayList { get; set; }
+        internal List<SmartishTItem> DisplayList { get; set; }
 
         [Parameter]
         public RenderFragment ChildContent { get; set; }
@@ -55,8 +55,8 @@ namespace SmartishTable
         [Parameter]
         public int MaxNumberOfSorts { get; set; } = 1;
 
-        internal ColumnSortCollection<TItem> ColumnSorts;
-        internal ColumnFilterCollection<TItem> ColumnFilters;
+        internal ColumnSortCollection<SmartishTItem> ColumnSorts;
+        internal ColumnFilterCollection<SmartishTItem> ColumnFilters;
         internal Paginator Paginator;
         private bool disposedValue;
 
@@ -80,7 +80,7 @@ namespace SmartishTable
                 await Refresh();
         }
 
-        private List<TItem> GetData()
+        private List<SmartishTItem> GetData()
         {
             if (SafeList == null)
                 return null;
@@ -101,10 +101,10 @@ namespace SmartishTable
             return query.ToList();
         }
 
-        public void AddFilterComponent(IFilter<TItem> filterComponent)
+        public void AddFilterComponent(IFilter<SmartishTItem> filterComponent)
         {
             if (ColumnFilters == null)
-                ColumnFilters = new ColumnFilterCollection<TItem>();
+                ColumnFilters = new ColumnFilterCollection<SmartishTItem>();
             ColumnFilters.Add(filterComponent);
         }
 
@@ -120,13 +120,13 @@ namespace SmartishTable
             StateHasChanged();
         }
 
-        public Task Add(TItem item)
+        public Task Add(SmartishTItem item)
         {
             SafeList.Add(item);
             return Refresh();
         }
 
-        public Task UpdateAt(int index, TItem item)
+        public Task UpdateAt(int index, SmartishTItem item)
         {
             var dataIndex = SafeList.IndexOf(DisplayList[index]);
             SafeList[dataIndex] = item;
@@ -140,7 +140,7 @@ namespace SmartishTable
             return Refresh();
         }
 
-        public TItem GetAt(int index)
+        public SmartishTItem GetAt(int index)
         {
             return DisplayList[index];
         }

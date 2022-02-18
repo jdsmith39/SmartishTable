@@ -8,16 +8,16 @@ using System.Runtime.CompilerServices;
 
 namespace SmartishTable
 {
-    public partial class FilterString<TItem> : INotifyPropertyChanged, IFilter<TItem>, IDisposable
+    public partial class FilterString<SmartishTItem> : INotifyPropertyChanged, IFilter<SmartishTItem>, IDisposable
     {
         [Parameter]
         public RenderFragment<FilterContext<string>> ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
-        public Root<TItem> Root { get; set; }
+        public Root<SmartishTItem> Root { get; set; }
 
         [Parameter]
-        public Expression<Func<TItem, object>> Field { get; set; }
+        public Expression<Func<SmartishTItem, object>> Field { get; set; }
 
         /// <summary>
         /// Default: Contains
@@ -32,12 +32,12 @@ namespace SmartishTable
 
         public FilterContext<string> Context { get; private set; }
 
-        public virtual Expression<Func<TItem, bool>> GetFilter()
+        public virtual Expression<Func<SmartishTItem, bool>> GetFilter()
         {
             if (string.IsNullOrEmpty(Context.FilterValue))
                 return null;
 
-            var param = Expression.Parameter(typeof(TItem), "w");
+            var param = Expression.Parameter(typeof(SmartishTItem), "w");
 
             var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
             var filterParam = Expression.Constant(Context.FilterValue);
@@ -48,11 +48,11 @@ namespace SmartishTable
                 case StringOperators.EndsWith:
                     var method = typeof(string).GetMethod(Operator.ToString(), new[] { typeof(string), typeof(StringComparison) });
                     var call = Expression.Call(filterProperty, method, filterParam, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), call), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), call), param);
                 case StringOperators.Equals:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterProperty, filterParam)), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterProperty, filterParam)), param);
                 case StringOperators.NotEquals:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterProperty, filterParam)), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterProperty, filterParam)), param);
             }
             return null;
         }

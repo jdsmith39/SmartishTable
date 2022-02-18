@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartishTable
 {
-    public partial class Sort<TItem>
+    public partial class Sort<SmartishTItem>
     {
         public Sort()
         {
@@ -17,10 +17,10 @@ namespace SmartishTable
         public RenderFragment ChildContent { get; set; }
 
         [CascadingParameter(Name = "SmartishTableRoot")]
-        public Root<TItem> Root { get; set; }
+        public Root<SmartishTItem> Root { get; set; }
 
         [Parameter]
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
+        public System.Linq.Expressions.Expression<Func<SmartishTItem, object>> Field { get; set; }
 
         [Parameter]
         public bool IsDefaultSort { get; set; } = false;
@@ -64,8 +64,8 @@ namespace SmartishTable
         protected override void OnInitialized()
         {
             if (Root.ColumnSorts == null)
-                Root.ColumnSorts = new ColumnSortCollection<TItem>();
-            Root.ColumnSorts.Add(key, new ColumnSortData<TItem>() { Field = Field, IsDescending = false, SortOrder = null, Comparer = Comparer });
+                Root.ColumnSorts = new ColumnSortCollection<SmartishTItem>();
+            Root.ColumnSorts.Add(key, new ColumnSortData<SmartishTItem>() { Field = Field, IsDescending = false, SortOrder = null, Comparer = Comparer });
 
             if (IsDefaultSort)
             {

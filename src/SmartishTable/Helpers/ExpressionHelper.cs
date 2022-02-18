@@ -7,7 +7,7 @@ namespace System.Linq.Expressions
 {
     public static class ExpressionHelper
     {
-        private static MemberExpression GetMemberExpression<TItem>(Expression<Func<TItem, object>> expression)
+        private static MemberExpression GetMemberExpression<SmartishTItem>(Expression<Func<SmartishTItem, object>> expression)
         {
             if (!(expression.Body is MemberExpression body))
             {
@@ -18,7 +18,7 @@ namespace System.Linq.Expressions
             return body;
         }
 
-        internal static string GetPropertyName<TItem>(Expression<Func<TItem, object>> expression)
+        internal static string GetPropertyName<SmartishTItem>(Expression<Func<SmartishTItem, object>> expression)
         {
             if (expression == null)
                 return null;
@@ -32,7 +32,7 @@ namespace System.Linq.Expressions
             return name;
         }
 
-        internal static Type GetPropertyType<TItem>(Expression<Func<TItem, object>> expression)
+        internal static Type GetPropertyType<SmartishTItem>(Expression<Func<SmartishTItem, object>> expression)
         {
             if (expression == null)
                 return null;
