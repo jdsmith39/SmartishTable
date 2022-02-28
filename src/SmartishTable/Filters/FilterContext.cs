@@ -1,14 +1,13 @@
 ﻿using SmartishTable.Helpers;
 
-namespace SmartishTable.Filters
+namespace SmartishTable.Filters;
+
+public class FilterContext<T> : BaseClass
 {
-    public class FilterContext<T> : BaseClass
+    private T _filterValue;
+    public T FilterValue
     {
-        private T _filterValue;
-        public T FilterValue
-        {
-            get { return _filterValue; }
-            set { SetProperty(ref _filterValue, value); } 
-        }
+        get { return _filterValue; }
+        set { SetProperty(ref _filterValue, value); } 
     }
 }

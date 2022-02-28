@@ -24,7 +24,7 @@ else
         <SmartishTable.Sort Field="o=>o.JobTitle" Css="canSelect">Job Title</SmartishTable.Sort>
         <SmartishTable.Sort Field="o=>o.Country" Css="canSelect">Country</SmartishTable.Sort>
         <SmartishTable.Sort Field="o=>o.City" Css="canSelect">City</SmartishTable.Sort>
-        <SmartishTable.Sort Field="o=>o.BirthDate" Css="canSelect">Birth Date</SmartishTable.Sort>
+        <SmartishTable.Sort Field="o=>o.BirthDate" Css="canSelect">Birth Date/Time</SmartishTable.Sort>
         <SmartishTable.Sort Field="o=>o.Income" Css="canSelect">Income</SmartishTable.Sort>
         <SmartishTable.Sort Colspan="2" Field="o=>o.IsActive" Css="canSelect">IsActive</SmartishTable.Sort>
       </tr>
@@ -135,9 +135,9 @@ else
               <option value="@item">@item.GetDisplayName()</option>
             }
           </select>
-          <SmartishTable.FilterDateTime SmartishTItem=Person Field="x=>x.BirthDate" Context="filterContext" Operator="birthDateOperator">
-            <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-          </SmartishTable.FilterDateTime>
+          <SmartishTable.FilterDatesTimes SmartishTItem=Person Field="x=>x.BirthDate" Context="filterContext" Operator="birthDateOperator" FilterType="DateTime?">
+            <input type="date" @bind-value="@filterContext.FilterValue"  class="form-control form-control-sm" />
+          </SmartishTable.FilterDatesTimes>
         </td>
         <td>
           <select @bind="incomeOperator1" class="form-control form-control-sm">
@@ -169,7 +169,7 @@ else
           </select>
           <SmartishTable.FilterBoolean Field="o=>o.IsActive" Operator="activeOperator"></SmartishTable.FilterBoolean>
         </td>
-        <td>test for colspan within sort</td>
+        <td>Sort colspan example</td>
       </tr>
     </thead>
     <tbody>
@@ -184,7 +184,7 @@ else
           <td>@row.Item.JobTitle</td>
           <td>@row.Item.Country</td>
           <td>@row.Item.City</td>
-          <td>@row.Item.BirthDate.ToShortDateString()</td>
+          <td>@row.Item.BirthDate.ToString()</td>
           <td>@row.Item.Income?.ToString("C")</td>
           <td class="text-center" colspan="2">@row.Item.IsActive</td>
         </tr>
