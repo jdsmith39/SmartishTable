@@ -6,7 +6,7 @@
       </div>
       <div class="col-auto">
         <select class="form-select" @bind="Paginator.PageSize">
-          @foreach (var item in DCI.Web.Client.Common.Constants.PageSizes)
+          @foreach (var item in PageSizes)
           {
             <option selected=@(item == Paginator.PageSize) value="@(item)">@item</option>
           }
@@ -65,6 +65,8 @@
   [Parameter]
   public int? DefaultPageSize { get; set; }
 
+  public int[] PageSizes { get; set; } = new[] { 10, 20, 50, 100 };
+
   private int? currentPage
   {
     get => Paginator.Page;
@@ -86,7 +88,7 @@
 
   protected override void OnInitialized()
   {
-    Paginator.PageSize = DefaultPageSize ?? Constants.DefaultPageSize;
+    Paginator.PageSize = DefaultPageSize ?? 10;
     currentPage = Paginator.Page;
   }
 

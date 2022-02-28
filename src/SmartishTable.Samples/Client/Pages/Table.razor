@@ -26,7 +26,7 @@ else
         <SmartishTable.Sort Field="o=>o.City" Css="canSelect">City</SmartishTable.Sort>
         <SmartishTable.Sort Field="o=>o.BirthDate" Css="canSelect">Birth Date</SmartishTable.Sort>
         <SmartishTable.Sort Field="o=>o.Income" Css="canSelect">Income</SmartishTable.Sort>
-        <SmartishTable.Sort Field="o=>o.IsActive" Css="canSelect">IsActive</SmartishTable.Sort>
+        <SmartishTable.Sort Colspan="2" Field="o=>o.IsActive" Css="canSelect">IsActive</SmartishTable.Sort>
       </tr>
       <tr>
         <td>
@@ -169,6 +169,7 @@ else
           </select>
           <SmartishTable.FilterBoolean Field="o=>o.IsActive" Operator="activeOperator"></SmartishTable.FilterBoolean>
         </td>
+        <td>test for colspan within sort</td>
       </tr>
     </thead>
     <tbody>
@@ -185,13 +186,13 @@ else
           <td>@row.Item.City</td>
           <td>@row.Item.BirthDate.ToShortDateString()</td>
           <td>@row.Item.Income?.ToString("C")</td>
-          <td>@row.Item.IsActive</td>
+          <td class="text-center" colspan="2">@row.Item.IsActive</td>
         </tr>
       </SmartishTable.Repeater>
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="12">
+        <td colspan="13">
           <SmartishTable.Pagination Context="Pager">
             <SmartishTablePager Paginator="Pager" DefaultPageSize="10"></SmartishTablePager>
           </SmartishTable.Pagination>
