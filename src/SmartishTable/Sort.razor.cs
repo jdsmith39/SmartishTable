@@ -37,6 +37,12 @@ namespace SmartishTable
         [Parameter]
         public string Css { get; set; }
 
+        /// <summary>
+        /// Adds colspan attribute if assigned
+        /// </summary>
+        [Parameter]
+        public int? Colspan { get; set; }
+
         [Parameter]
         public IComparer<object> Comparer { get; set; }
 
@@ -77,10 +83,13 @@ namespace SmartishTable
             {
                 HeaderFragment = (builder) =>
                 {
-                    builder.OpenElement(0, Root.HeaderTag);
-                    builder.AddAttribute(1, "class", $"{Css} {SortCss}");
-                    builder.AddAttribute(2, "onclick", onSortClick);
-                    builder.AddContent(3, ChildContent);
+                    var counter = 0;
+                    builder.OpenElement(counter++, Root.HeaderTag);
+                    builder.AddAttribute(counter++, "class", $"{Css} {SortCss}");
+                    builder.AddAttribute(counter++, "onclick", onSortClick);
+                    if(Colspan.HasValue)
+                        builder.AddAttribute(counter++, "colspan", Colspan.Value);
+                    builder.AddContent(counter++, ChildContent);
                     builder.CloseElement();
                 };
             }

@@ -57,3 +57,7 @@ a, .btn-link {
 .hover:hover {
     background-color:lightgray;
 }
+
+.paging-input-width-form-control {
+    width: 80px;
+}
