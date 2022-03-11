@@ -47,7 +47,7 @@ public class Paginator : BaseClass
             else if (!PageSize.HasValue && Count > 0)
                 return 1;
 
-            return PageSize.Value * (Page - 1) + 1;
+            return Count > 0 ? PageSize.Value * (Page - 1) + 1 : 0;
         }
     }
 
