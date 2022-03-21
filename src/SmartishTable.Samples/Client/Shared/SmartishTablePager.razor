@@ -5,7 +5,7 @@
         <div class="form-control-plaintext">Display</div>
       </div>
       <div class="col-auto">
-        <select class="form-select" @bind="Paginator.PageSize">
+        <select class="form-control" @bind="Paginator.PageSize">
           @foreach (var item in PageSizes)
           {
             <option selected=@(item == Paginator.PageSize) value="@(item)">@item</option>

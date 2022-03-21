@@ -25,6 +25,7 @@
     <SmartishTable.Sort Field="o=>o.FirstName" Css="col-md-4 canSelect">First Name</SmartishTable.Sort>
     <SmartishTable.Sort Field="o=>o.Email" Css="col-md-4 canSelect">Email</SmartishTable.Sort>
     <SmartishTable.Repeater Context="row">
+        <RowTemplate>
       <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-2">
         <div class="card h-100">
           <div class="card-header">
@@ -44,6 +45,7 @@
           </div>
         </div>
       </div>
+      </RowTemplate>
     </SmartishTable.Repeater>
   </div>
 </SmartishTable.Root>

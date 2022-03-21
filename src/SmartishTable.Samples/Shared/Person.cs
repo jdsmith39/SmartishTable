@@ -1,11 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace SmartishTable.Samples.Shared
 {
     public class Person
     {
+        public Person()
+        {
+            var rand = new Random();
+
+            var value = rand.Next(1000);
+
+            if (value % 2 == 0 || true)
+            {
+                this.NestedObj = new Nested()
+                {
+                    IntProp = value,
+                    StringProp = GetRandomString(value % 30),
+                    DateTimeProp = DateTime.Now.AddHours(-300).AddHours(value)
+                };
+            }
+        }
+
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -20,5 +36,25 @@ namespace SmartishTable.Samples.Shared
         public DateTime BirthDate { get; set; }
         public bool IsActive { get; set; }
         public decimal? Income { get; set; }
+
+        public Nested NestedObj { get; set; }
+
+        public string GetRandomString(int length)
+        {
+            var r = new Random();
+            return new String(Enumerable.Range(0, length).Select(n => (Char)(r.Next(32, 127))).ToArray());
+        }
     }
+
+    public class Nested
+    {
+        public int IntProp { get; set; }
+
+        public string StringProp { get; set; }
+
+        public DateTime? DateTimeProp { get; set; }
+
+    }
+
+    
 }

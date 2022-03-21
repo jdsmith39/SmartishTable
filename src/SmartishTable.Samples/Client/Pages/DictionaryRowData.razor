@@ -82,12 +82,14 @@ else
         </thead>
         <tbody>
             <SmartishTable.Repeater Context="row">
+                <RowTemplate>
                 <tr>
                     @foreach (var item in keys)
                     {
                         <td>@row.Item[item]</td>
                     }
                 </tr>
+                </RowTemplate>
             </SmartishTable.Repeater>
         </tbody>
         <tfoot>

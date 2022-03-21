@@ -1,6 +1,6 @@
 ﻿using System;
 
-public static class TypeExtensions
+internal static class TypeExtensions
 {
     public static bool IsNumeric(this Type type)
     {
