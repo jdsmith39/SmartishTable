@@ -18,7 +18,7 @@ public partial class FilterDatesTimes<SmartishTItem, FilterType> : INotifyProper
     public Root<SmartishTItem> Root { get; set; }
 
     [Parameter]
-    public System.Linq.Expressions.Expression<Func<SmartishTItem, object>> Field { get; set; }
+    public Expression<Func<SmartishTItem, object>> Field { get; set; }
 
     /// <summary>
     /// Default: Equals
@@ -39,25 +39,26 @@ public partial class FilterDatesTimes<SmartishTItem, FilterType> : INotifyProper
             return null;
 
         var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
-        var param = Expression.Parameter(typeof(SmartishTItem), "w");
-        var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
+        var propertyPath = Field.GetPropertyName(fieldType);
+        var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
+        var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
         var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
         var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
         var filterParam = Expression.Constant(value);
         switch (Operator)
         {
             case DateTimeOperators.Equals:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), paramExp);
             case DateTimeOperators.NotEquals:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), paramExp);
             case DateTimeOperators.GreaterThan:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThan(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThan(filterPropertyConverted, filterParam)), paramExp);
             case DateTimeOperators.GreaterThanOrEqual:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThanOrEqual(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThanOrEqual(filterPropertyConverted, filterParam)), paramExp);
             case DateTimeOperators.LessThan:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThan(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThan(filterPropertyConverted, filterParam)), paramExp);
             case DateTimeOperators.LessThanOrEqual:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThanOrEqual(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThanOrEqual(filterPropertyConverted, filterParam)), paramExp);
         }
         return null;
     }

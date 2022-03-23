@@ -37,32 +37,11 @@ public partial class FilterNumeric<SmartishTItem, FilterType> : INotifyPropertyC
     {
         if (Context.FilterValue == null)
             return null;
-        Console.WriteLine(Field.NodeType);
-        var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
-        Console.WriteLine("FieldType:  " + fieldType.FullName);
-        var propertyPath = Field.GetMemberExpression().GetPropertyName(fieldType);
-        Console.WriteLine("FullPath:  " + propertyPath);
-        var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
-        // The property name might be a nested expression like a.b.c
-        var path = propertyPath.Split('.');
-        Expression lastMember = paramExp;
-        
-        foreach (var p in path)
-        {
-            if (lastMember == null)
-            {
-                lastMember = Expression.Property(paramExp, p);
-            }
-            else
-            {
-                lastMember = Expression.Property(lastMember, p);
-            }
-        }
 
-        var filterPropertyExpression = ExpressionHelper.CreatePropertyExpression<SmartishTItem>(propertyPath);
-        //var filterProperty = ExpressionHelper.InnerRecursiveGet()
-        //var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
-        var filterProperty = lastMember;// Expression.Property(filterPropertyExpression, ExpressionHelper.GetPropertyName(Field));
+        var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
+        var propertyPath = Field.GetPropertyName(fieldType);
+        var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
+        var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
         var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
         var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
         var filterParam = Expression.Constant(value);

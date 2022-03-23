@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace System.Linq.Expressions;
 
@@ -32,22 +30,13 @@ public static class ExpressionHelper
         return name;
     }
 
-    internal static string GetPropertyName(this MemberExpression me, Type ignorePathUntil)
+    internal static string GetPropertyName<SmartishTItem>(this Expression<Func<SmartishTItem, object>> expression, Type ignorePathUntil)
     {
-        //var body = expression.Body;
-        //while (body.NodeType == ExpressionType.Convert || body.NodeType == ExpressionType.ConvertChecked)
-        //{
-        //    body = ((UnaryExpression)body).Operand;
-        //}
-
         var result = new List<string>();
-        //var me = body as MemberExpression;
-
-        if (me != null && me.Expression.NodeType == ExpressionType.MemberAccess)
+        var memberExpression = GetMemberExpression(expression);
+        if (memberExpression != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
         {
-            var path = me.Expression as MemberExpression;
-            Console.WriteLine($"me.Expression:  " + path.Member.Name);
-            Console.WriteLine("Path.Expression.Type.FullName:  " + path.Expression.Type.FullName);
+            var path = memberExpression.Expression as MemberExpression;
             var notFinalMember = ignorePathUntil != null && path.Expression.Type != ignorePathUntil;
 
             do
@@ -56,50 +45,36 @@ public static class ExpressionHelper
                 {
                     result.Add(path.Member.Name);
                 }
-                //var propInfo = (path.Member as PropertyInfo);
-                //Console.WriteLine("Prop type:  " + propInfo?.PropertyType.FullName);
-                //if (notFinalMember && (path.Member as PropertyInfo)?.PropertyType == ignorePathUntil)
-                //{
-                //    notFinalMember = false;
-                //}
 
-                Console.WriteLine("Path.Expression " + path.Expression.Type.FullName);
                 path = path.Expression as MemberExpression;
-                Console.WriteLine("Path:  " + path?.Member.Name);
 
             } while (path != null && path.NodeType == ExpressionType.MemberAccess);
         }
 
-        var propertyName = me?.Member.Name;
+        var propertyName = memberExpression?.Member.Name;
         result.Add(propertyName);
 
         if (result.Count == 0)
         {
-            throw new InvalidOperationException("Expression does not refer to a property: " + me.ToString());
+            throw new InvalidOperationException("Expression does not refer to a property: " + memberExpression.ToString());
         }
 
         return string.Join(".", result);
     }
 
-    internal static Expression CreatePropertyExpression<T>(string propertyPath)
+    /// <summary>
+    /// Takes the path and goes down it to get to the last member expression.
+    /// </summary>
+    /// <param name="propertyPath"><see cref="string"/> propertyPath i.e.  x.Obj.Property</param>
+    /// <param name="paramExp">parameter expression</param>
+    /// <returns><see cref="MemberExpression"/></returns>
+    internal static Expression GetLastMemberExpression(string propertyPath, ParameterExpression paramExp)
     {
-        var entityType = typeof(T);
-        ParameterExpression paramExp = Expression.Parameter(entityType, "w");
+        Expression lastMember = paramExp;
 
-        // The property name might be a nested expression like a.b.c
-        var path = propertyPath.Split('.');
-        MemberExpression lastMember = null;
-
-        foreach (var p in path)
+        foreach (var p in propertyPath.Split('.'))
         {
-            if (lastMember == null)
-            {
-                lastMember = Expression.Property(paramExp, p);
-            }
-            else
-            {
-                lastMember = Expression.Property(lastMember, p);
-            }
+            lastMember = Expression.Property(lastMember, p);
         }
 
         return lastMember;

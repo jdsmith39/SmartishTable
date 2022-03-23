@@ -11,14 +11,23 @@ namespace SmartishTable.Samples.Shared
 
             var value = rand.Next(1000);
 
-            if (value % 2 == 0 || true)
+            if (value % 4 < 3)
             {
                 this.NestedObj = new Nested()
                 {
-                    IntProp = value,
-                    StringProp = GetRandomString(value % 30),
-                    DateTimeProp = DateTime.Now.AddHours(-300).AddHours(value)
+                    IntProp = value < 50 ? null : value,
+                    StringProp = value % 40 == 0 ? null : GetRandomString(value % 40),
+                    DateTimeProp = value % 20 == 0 ? null : DateTime.Now.AddHours(-300).AddHours(value)
                 };
+                if (value % 2 == 0)
+                {
+                    NestedObj.NestedObj = new Nested()
+                    {
+                        IntProp = value > 850 ? null : value,
+                        StringProp = value % 30 == 0 ? null : GetRandomString(value % 30),
+                        DateTimeProp = value % 15 == 0 ? null : DateTime.UtcNow.AddHours(-300).AddHours(value)
+                    };
+                }
             }
         }
 
@@ -42,19 +51,18 @@ namespace SmartishTable.Samples.Shared
         public string GetRandomString(int length)
         {
             var r = new Random();
-            return new String(Enumerable.Range(0, length).Select(n => (Char)(r.Next(32, 127))).ToArray());
+            return new string(Enumerable.Range(0, length).Select(n => (Char)(r.Next(32, 127))).ToArray());
         }
     }
 
     public class Nested
     {
-        public int IntProp { get; set; }
+        public int? IntProp { get; set; }
 
         public string StringProp { get; set; }
 
         public DateTime? DateTimeProp { get; set; }
 
+        public Nested NestedObj { get; set; }
     }
-
-    
 }
