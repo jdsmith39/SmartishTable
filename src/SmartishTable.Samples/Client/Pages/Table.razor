@@ -259,13 +259,13 @@ else
   private SmartishTable.Filters.StringOperators jobTitleOperator = SmartishTable.Filters.StringOperators.Contains;
   private SmartishTable.Filters.StringOperators countryOperator = SmartishTable.Filters.StringOperators.Contains;
   private SmartishTable.Filters.StringOperators cityOperator = SmartishTable.Filters.StringOperators.Contains;
-  private SmartishTable.Filters.DateTimeOperators birthDateOperator = SmartishTable.Filters.DateTimeOperators.Equals;
+  private SmartishTable.Filters.DateTimeOperators birthDateOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
   private SmartishTable.Filters.NumericOperators incomeOperator1 = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
   private SmartishTable.Filters.NumericOperators incomeOperator2 = SmartishTable.Filters.NumericOperators.LessThanOrEqual;
   private SmartishTable.Filters.BooleanOperators? activeOperator = SmartishTable.Filters.BooleanOperators.Equals;
   private SmartishTable.Filters.NumericOperators intPropOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
   private SmartishTable.Filters.StringOperators stringPropOperator = SmartishTable.Filters.StringOperators.Contains;
-  private SmartishTable.Filters.DateTimeOperators dateTimePropOperator = SmartishTable.Filters.DateTimeOperators.Equals;
+  private SmartishTable.Filters.DateTimeOperators dateTimePropOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
 
   protected override async Task OnInitializedAsync()
   {
