@@ -39,25 +39,26 @@ public partial class FilterNumeric<SmartishTItem, FilterType> : INotifyPropertyC
             return null;
 
         var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
-        var param = Expression.Parameter(typeof(SmartishTItem), "w");
-        var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
+        var propertyPath = Field.GetPropertyName(fieldType);
+        var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
+        var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
         var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
         var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
         var filterParam = Expression.Constant(value);
         switch (Operator)
         {
             case NumericOperators.Equals:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), paramExp);
             case NumericOperators.NotEquals:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), paramExp);
             case NumericOperators.GreaterThan:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThan(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThan(filterPropertyConverted, filterParam)), paramExp);
             case NumericOperators.GreaterThanOrEqual:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThanOrEqual(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThanOrEqual(filterPropertyConverted, filterParam)), paramExp);
             case NumericOperators.LessThan:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThan(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThan(filterPropertyConverted, filterParam)), paramExp);
             case NumericOperators.LessThanOrEqual:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThanOrEqual(filterPropertyConverted, filterParam)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThanOrEqual(filterPropertyConverted, filterParam)), paramExp);
         }
         return null;
     }

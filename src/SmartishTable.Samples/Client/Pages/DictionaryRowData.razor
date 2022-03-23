@@ -1,7 +1,7 @@
 ﻿@page "/DictionaryRowData"
 @inject HttpClient Http
 
-<h2>SmartishTable Samples - Dictionary Row Data</h2>
+<h2>SmartishTable Samples - Dictionary Row Data (Uses Custom Sort Comparer)</h2>
 
 @if (list == null || keys == null)
 {
@@ -82,12 +82,14 @@ else
         </thead>
         <tbody>
             <SmartishTable.Repeater Context="row">
+                <RowTemplate>
                 <tr>
                     @foreach (var item in keys)
                     {
                         <td>@row.Item[item]</td>
                     }
                 </tr>
+                </RowTemplate>
             </SmartishTable.Repeater>
         </tbody>
         <tfoot>

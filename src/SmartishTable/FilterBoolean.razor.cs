@@ -42,9 +42,11 @@ public partial class FilterBoolean<SmartishTItem> : INotifyPropertyChanged, IFil
             return null;
 
         var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
-        var param = Expression.Parameter(typeof(SmartishTItem), "w");
-        var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
+        var propertyPath = Field.GetPropertyName(fieldType);
+        var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
+        var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
         var filterPropertyConverted = Expression.Convert(filterProperty, fieldType);
+        
         switch (Operator)
         {
             case BooleanOperators.Equals:
@@ -52,13 +54,13 @@ public partial class FilterBoolean<SmartishTItem> : INotifyPropertyChanged, IFil
                 var value = Convert.ChangeType(Context.FilterValue, fieldType, CultureInfo.InvariantCulture);
                 var filterParam = Expression.Constant(value);
                 if (Operator == BooleanOperators.Equals)
-                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), paramExp);
                 else
-                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), param);
+                    return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), paramExp);
             case BooleanOperators.IsTrue:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsTrue(filterPropertyConverted)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsTrue(filterPropertyConverted)), paramExp);
             case BooleanOperators.IsFalse:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsFalse(filterPropertyConverted)), param);
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.IsFalse(filterPropertyConverted)), paramExp);
         }
         return null;
     }

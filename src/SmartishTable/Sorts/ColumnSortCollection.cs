@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SmartishTable.Sorts;
 
@@ -50,33 +52,25 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
         IOrderedQueryable<SmartishTItem> orderedQuery = null;
         foreach (var item in sortColumns)
         {
+            var fieldType = ExpressionHelper.GetPropertyType(item.Field).GetNonNullableType();
+            var propertyPath = item.Field.GetPropertyName(fieldType);
+            var paramExp = Expression.Parameter(typeof(SmartishTItem), "o");
+            var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
+            var filterPropertyConverted = Expression.Convert(filterProperty, typeof(object));
+            var lambda = Expression.Lambda<Func<SmartishTItem, object>>(Expression.Condition(filterProperty.CreateNullChecks(), filterPropertyConverted, Expression.Constant(null)), paramExp);
             if (item.SortOrder == 1)
             {
                 if (item.IsDescending)
-                {
-                    if (item.Comparer == null)
-                        orderedQuery = query.OrderByDescending(item.Field);
-                    else
-                        orderedQuery = query.OrderByDescending(item.Field, item.Comparer);
-                }   
+                    orderedQuery = query.OrderByDescending(lambda, item.Comparer);
                 else
-                {
-                    if (item.Comparer == null)
-                        orderedQuery = query.OrderBy(item.Field);
-                    else
-                        orderedQuery = query.OrderBy(item.Field, item.Comparer);
-                }
+                    orderedQuery = query.OrderBy(lambda, item.Comparer);
             }
             else
             {
                 if (item.IsDescending)
-                {
-                    orderedQuery = orderedQuery.ThenByDescending(item.Field);
-                }
+                    orderedQuery = orderedQuery.ThenByDescending(lambda, item.Comparer);
                 else
-                {
-                    orderedQuery = orderedQuery.ThenBy(item.Field);
-                }
+                    orderedQuery = orderedQuery.ThenBy(lambda, item.Comparer);
             }
         }
 
