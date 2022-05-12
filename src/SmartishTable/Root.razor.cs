@@ -14,12 +14,12 @@ namespace SmartishTable;
 public partial class Root<SmartishTItem> : IDisposable
 {
     [Parameter]
-    public List<SmartishTItem> SafeList { get; set; }
+    public List<SmartishTItem> SafeList { get; set; } = default!;
 
-    internal List<SmartishTItem> DisplayList { get; set; }
+    internal List<SmartishTItem>? DisplayList { get; set; }
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment ChildContent { get; set; } = default!;
 
     [Parameter]
     public string SortAscendingCss { get; set; } = "smartish-table-sort-asc";
@@ -46,7 +46,7 @@ public partial class Root<SmartishTItem> : IDisposable
     /// Event to listen to when data is updated
     /// </summary>
     [Parameter]
-    public Func<Task> OnDataUpdated { get; set; }
+    public Func<Task>? OnDataUpdated { get; set; }
 
     /// <summary>
     /// Default:  1
@@ -55,9 +55,9 @@ public partial class Root<SmartishTItem> : IDisposable
     [Parameter]
     public int MaxNumberOfSorts { get; set; } = 1;
 
-    internal ColumnSortCollection<SmartishTItem> ColumnSorts;
-    internal ColumnFilterCollection<SmartishTItem> ColumnFilters;
-    internal Paginator Paginator;
+    internal ColumnSortCollection<SmartishTItem> ColumnSorts = default!;
+    internal ColumnFilterCollection<SmartishTItem> ColumnFilters = default!;
+    internal Paginator Paginator = default!;
     private bool disposedValue;
 
     protected override void OnInitialized()
@@ -80,7 +80,41 @@ public partial class Root<SmartishTItem> : IDisposable
             await Refresh();
     }
 
-    private List<SmartishTItem> GetData()
+    /// <summary>
+    /// Gets the settings for smartish table
+    /// </summary>
+    /// <returns><see cref="SmartishTableSettings"/></returns>
+    public SmartishTableSettings GetSettings()
+    {
+        return new SmartishTableSettings()
+        {
+            Page = Paginator.Page,
+            PageSize = Paginator.PageSize,
+            ColumnSorts = ColumnSorts.GetSortSettings()
+        };
+    }
+
+    /// <summary>
+    /// Sets smartish table settings and refreshes
+    /// </summary>
+    /// <param name="settings"><see cref="SmartishTableSettings"/></param>
+    public async Task SetSettings(SmartishTableSettings settings)
+    {
+        if (settings == null)
+            return;
+
+        if (ColumnSorts != null)
+            ColumnSorts.SetSortSettings(MaxNumberOfSorts, settings.ColumnSorts);
+
+        if (settings.PageSize.HasValue)
+            Paginator.PageSize = settings.PageSize.Value;
+
+        Paginator.Page = settings.Page ?? 1;
+
+        await Refresh();
+    }
+
+    private List<SmartishTItem>? GetData()
     {
         if (SafeList == null)
             return null;
@@ -95,12 +129,16 @@ public partial class Root<SmartishTItem> : IDisposable
 
         Paginator.Count = query.Count();
 
-        if (Paginator != null && Paginator.PageSize.HasValue)
+        if (Paginator.PageSize.HasValue)
             query = query.Skip(Paginator.PageSize.Value * (Paginator.Page - 1)).Take(Paginator.PageSize.Value);
 
         return query.ToList();
     }
 
+    /// <summary>
+    /// Filters must be added here to function properly
+    /// </summary>
+    /// <param name="filterComponent"><see cref="IFilter{SmartishTItem}"/></param>
     public void AddFilterComponent(IFilter<SmartishTItem> filterComponent)
     {
         if (ColumnFilters == null)
@@ -108,6 +146,10 @@ public partial class Root<SmartishTItem> : IDisposable
         ColumnFilters.Add(filterComponent);
     }
 
+    /// <summary>
+    /// Refreshes smartish table by getting data again
+    /// </summary>
+    /// <param name="resetPaging">resets the page to page 1</param>
     public async Task Refresh(bool resetPaging = false)
     {
         if (resetPaging)
@@ -120,12 +162,21 @@ public partial class Root<SmartishTItem> : IDisposable
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Adds an item safe list
+    /// </summary>
+    /// <param name="item"><see cref="SmartishTItem"/></param>
     public Task Add(SmartishTItem item)
     {
         SafeList.Add(item);
         return Refresh();
     }
 
+    /// <summary>
+    /// Updates an item at specified index
+    /// </summary>
+    /// <param name="index">index of the displayed item (index is provided by the repeater context)</param>
+    /// <param name="item"><see cref="SmartishTItem"/></param>
     public Task UpdateAt(int index, SmartishTItem item)
     {
         var dataIndex = SafeList.IndexOf(DisplayList[index]);
@@ -133,6 +184,10 @@ public partial class Root<SmartishTItem> : IDisposable
         return Refresh();
     }
 
+    /// <summary>
+    /// Removes the item at specified index
+    /// </summary>
+    /// <param name="index">index of the displayed item (index is provided by the repeater context)</param>
     public Task RemoveAt(int index)
     {
         var item = DisplayList[index];
@@ -140,6 +195,11 @@ public partial class Root<SmartishTItem> : IDisposable
         return Refresh();
     }
 
+    /// <summary>
+    /// Get the item at specified index
+    /// </summary>
+    /// <param name="index">index of the displayed item (index is provided by the repeater context)</param>
+    /// <returns><see cref="SmartishTItem"/></returns>
     public SmartishTItem GetAt(int index)
     {
         return DisplayList[index];
@@ -158,6 +218,9 @@ public partial class Root<SmartishTItem> : IDisposable
         }
     }
 
+    /// <summary>
+    /// Disposes SmartishTable
+    /// </summary>
     public void Dispose()
     {
         Dispose(disposing: true);

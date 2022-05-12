@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SmartishTable.Sorts;
 
-internal class ColumnSortData<SmartishTItem>
+internal class ColumnSortData<SmartishTItem> : ColumnSort
 {
-    public System.Linq.Expressions.Expression<Func<SmartishTItem, object>> Field { get; set; }
-    
-    public bool IsDescending { get; set; }
+    [JsonIgnore]
+    public System.Linq.Expressions.Expression<Func<SmartishTItem, object>> Field { get; set; } = default!;
 
-    /// <summary>
-    /// Null = no sort.
-    /// > 0 equals sort order
-    /// If same number, it goes in execution order
-    /// </summary>
-    [Range(1, int.MaxValue)]
-    public int? SortOrder { get; set; }
-
-    public IComparer<object> Comparer { get; set; }
+    [JsonIgnore]
+    public IComparer<object>? Comparer { get; set; }
 
     internal void Reset()
     {

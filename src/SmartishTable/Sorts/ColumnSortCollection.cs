@@ -46,10 +46,15 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
         }
     }
 
+    private IOrderedEnumerable<ColumnSortData<SmartishTItem>> GetSortColumns()
+    {
+        return this.Values.Where(w => w.SortOrder.HasValue).OrderBy(o => o.SortOrder);
+    }
+
     internal IQueryable<SmartishTItem> SetOrderBys(IQueryable<SmartishTItem> query)
     {
-        var sortColumns = this.Values.Where(w => w.SortOrder.HasValue).OrderBy(o => o.SortOrder);
-        IOrderedQueryable<SmartishTItem> orderedQuery = null;
+        var sortColumns = GetSortColumns();
+        IOrderedQueryable<SmartishTItem>? orderedQuery = null;
         foreach (var item in sortColumns)
         {
             var fieldType = ExpressionHelper.GetPropertyType(item.Field).GetNonNullableType();
@@ -68,9 +73,9 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
             else
             {
                 if (item.IsDescending)
-                    orderedQuery = orderedQuery.ThenByDescending(lambda, item.Comparer);
+                    orderedQuery = orderedQuery!.ThenByDescending(lambda, item.Comparer);
                 else
-                    orderedQuery = orderedQuery.ThenBy(lambda, item.Comparer);
+                    orderedQuery = orderedQuery!.ThenBy(lambda, item.Comparer);
             }
         }
 
@@ -79,5 +84,60 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
 
         // nothing sorted
         return query;
+    }
+
+    internal List<ColumnSort> GetSortSettings()
+    {
+        return GetSortColumns().Select(s=>
+        {
+            if (string.IsNullOrEmpty(s.Name))
+            {
+                var type = ExpressionHelper.GetPropertyType(s.Field);
+                s.Name = ExpressionHelper.GetPropertyName(s.Field, type);
+            }
+
+            var x = new ColumnSort()
+            {
+                IsDescending = s.IsDescending,
+                SortOrder = s.SortOrder,
+                Name = s.Name
+            };
+            
+            return x;
+        }).ToList();
+    }
+
+    internal void SetSortSettings(int maxNumberOfSorts, List<ColumnSort> columns)
+    {
+        // clear existing sorts
+        foreach (var item in Values)
+        {
+            if (string.IsNullOrEmpty(item.Name))
+            {
+                var type = ExpressionHelper.GetPropertyType(item.Field);
+                item.Name = ExpressionHelper.GetPropertyName(item.Field, type);
+            }
+            item.IsDescending = false;
+            item.SortOrder = null;
+        }
+
+        // nothing to set
+        if (columns == null)
+            return;
+
+        // apply new sorts, can't go above max number sorts allowed
+        var counter = 0;
+        foreach (var item in from v in Values
+                             join c in columns on v.Name equals c.Name
+                             orderby c.SortOrder
+                             select new {v, c})
+        {
+            item.v.IsDescending = item.c.IsDescending;
+            item.v.SortOrder = item.c.SortOrder;
+
+            counter++;
+            if (maxNumberOfSorts == counter)
+                break;
+        }
     }
 }
