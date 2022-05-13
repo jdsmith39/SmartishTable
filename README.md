@@ -14,14 +14,26 @@ Not dependent on any CSS framework.
 - None!
 
 ## Features
-- Now includes an example of adding custom filters and dynamic columns using a dictionary
 - Fully customizable UI
 	- No UI framework dependency
 - Paging
 - Sorting
+	- Support for IComparer (example included)
 - Filtering
-	- Boolean (Equals, Not Equals, IsTrue, Is False)
+	- Boolean (Equals, Not Equals, Is True, Is False)
 	- DateTimes (Equals, Not Equals, >, >=, <, <=)
 	- Numbers (Equals, Not Equals, >, >=, <, <=)
 	- Strings (Contains, StartsWith, EndsWith, Equals, Not Equals)
 	- Custom (Create a component that implements IFilter<TItem> and off you go!)
+		- example included!
+- Included examples:
+	- Simple example of cards with sorting.
+	- Regular Table with lots of data and sorting/filtering and max number of sorts being 2
+	- Parameter based auto refreshing
+	- Custom Filter
+	- Dynamic Columns using a dictionary.
+		- Custom Comparer
+	- Nested objects with sorting and filtering
+	- Get/Set configuration settings (for now, this is page #, page size, and sorting info), so the settings can be stored in localstorage (or somewhere else) and reloaded on next visit.
+		- also shows how to use the OnDataUpdated eventCallback which also sends back the current configuration settings.
+		- Binding Max Number of Sorts so it can be changed on the fly

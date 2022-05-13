@@ -1,0 +1,305 @@
+﻿@page "/tableGetSetSettings"
+@using SmartishTable.Samples.Shared
+@using SmartishTable.Filters
+@inject HttpClient Http
+
+<h4>SmartishTable Samples - Get/Set settings And Initial Settings be set (Page 8, Page Size 10, Email Desc)</h4>
+
+@if (list == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <div class="row mb-2">
+    <div class="col-6">
+      <div>
+        <label class="form-label">Max number of sorts</label>
+        <select @bind=selectedMaxNumberOfSorts class="form-control">
+          @foreach (var item in Enumerable.Range(1, 4))
+          {
+          <option selected=@(selectedMaxNumberOfSorts == item) value=@item>@item</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button type="button" class="btn btn-primary" @onclick=GetSettings>Get Settings</button>
+      <div>
+        <h5>Settings:</h5>
+        @System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions() { WriteIndented = true})
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <select @bind=selected class="form-control">
+          <option>Select...</option>
+          @foreach (var item in options)
+          {
+            <option value=@item.Key>@item.Key</option>
+          }
+        </select>
+        <button type="button" class="btn btn-primary" @onclick=SetSettings>Set Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <SmartishTable.Root SafeList="list" MaxNumberOfSorts="selectedMaxNumberOfSorts" @ref=table OnDataUpdated=table_OnDataUpdated InitialSettings="initialSettings">
+    <table class="table table-condensed table-striped">
+      <thead>
+        <tr>
+          <SmartishTable.Sort Field="o=>o.LastName" IsDefaultSort="true" Css="canSelect">Last Name</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.FirstName" Css="canSelect">First Name</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.Email" Css="canSelect">Email</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.Dependents" Css="canSelect">Dependents</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.BirthDate" Css="canSelect">Birth Date/Time</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.Income" Css="canSelect">Income</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.IsActive" Css="canSelect">IsActive</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.IntProp" Css="canSelect">Int Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.DateTimeProp" Css="canSelect">DateTime Nested Prop</SmartishTable.Sort>
+        </tr>
+        <tr>
+          <td>
+            <select @bind="lastNameOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.LastName" Context="filterContext" Operator="lastNameOperator">
+              <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" name="Search" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
+          <td>
+            <select @bind="firstNameOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.FirstName" Context="filterContext" Operator="firstNameOperator">
+              <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" name="Search" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
+          <td>
+            <select @bind="emailOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.Email" Context="filterContext" Operator="emailOperator">
+              <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" name="Search" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
+          <td>
+            <select @bind="dependentsOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterNumeric SmartishTItem=Person Field="x=>x.Dependents" Context="filterContext" Operator="dependentsOperator" FilterType="byte?">
+              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterNumeric>
+          </td>
+          <td>
+            <select @bind="birthDateOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.DateTimeOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterDatesTimes SmartishTItem=Person Field="x=>x.BirthDate" Context="filterContext" Operator="birthDateOperator" FilterType="DateTime?">
+              <input type="date" @bind-value="@filterContext.FilterValue" class="form-control form-control-sm" />
+            </SmartishTable.FilterDatesTimes>
+          </td>
+          <td>
+            <select @bind="incomeOperator1" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.Income" Context="filterContext" Operator="incomeOperator1" FilterType="decimal?">
+              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterNumeric>
+            <select @bind="incomeOperator2" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.Income" Context="filterContext" Operator="incomeOperator2" FilterType="decimal?">
+              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterNumeric>
+          </td>
+          <td>
+            <select @bind="activeOperator" class="form-control form-control-sm">
+              <option value="@SmartishTable.Filters.BooleanOperators.Equals">All</option>
+              @foreach (var item in SmartishTable.Filters.BooleanOperators.Equals.GetList().Where(w => ((byte)w) > 8))
+              {
+                <option selected="@(activeOperator == item)" value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterBoolean Field="o=>o.IsActive" Operator="activeOperator"></SmartishTable.FilterBoolean>
+          </td>
+          <td>
+            <select @bind="intPropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.NestedObj.IntProp" Context="filterContext" Operator="intPropOperator" FilterType="decimal?">
+              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterNumeric>
+          </td>
+          <td>
+            <select @bind="dateTimePropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.DateTimeOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterDatesTimes SmartishTItem=Person Field="x=>x.NestedObj.DateTimeProp" Context="filterContext" Operator="dateTimePropOperator" FilterType="DateTime?">
+              <input type="date" @bind-value="@filterContext.FilterValue" class="form-control form-control-sm" />
+            </SmartishTable.FilterDatesTimes>
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <SmartishTable.Repeater Context="row">
+          <RowTemplate>
+            <tr>
+              <td>@row.Item.LastName</td>
+              <td>@row.Item.FirstName</td>
+              <td>@row.Item.Email</td>
+              <td>@row.Item.Dependents</td>
+              <td>@row.Item.BirthDate.ToString()</td>
+              <td>@row.Item.Income?.ToString("C")</td>
+              <td class="text-center">@row.Item.IsActive</td>
+              <td>@row.Item.NestedObj?.IntProp</td>
+              <td>@row.Item.NestedObj?.DateTimeProp.ToString()</td>
+            </tr>
+          </RowTemplate>
+          <EmptyTemplate>
+            <tr><td colspan="9">Nothing found</td></tr>
+          </EmptyTemplate>
+        </SmartishTable.Repeater>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="9">
+            <SmartishTable.Pagination Context="Pager">
+              <SmartishTablePager Paginator="Pager" DefaultPageSize="10"></SmartishTablePager>
+            </SmartishTable.Pagination>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </SmartishTable.Root>
+}
+
+@code {
+  private List<Person> list;
+  private SmartishTable.Root<Person> table;
+
+  private SmartishTable.Filters.StringOperators lastNameOperator = SmartishTable.Filters.StringOperators.Contains;
+  private SmartishTable.Filters.StringOperators firstNameOperator = SmartishTable.Filters.StringOperators.Contains;
+  private SmartishTable.Filters.StringOperators emailOperator = SmartishTable.Filters.StringOperators.Contains;
+  private SmartishTable.Filters.NumericOperators dependentsOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.DateTimeOperators birthDateOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.NumericOperators incomeOperator1 = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.NumericOperators incomeOperator2 = SmartishTable.Filters.NumericOperators.LessThanOrEqual;
+  private SmartishTable.Filters.BooleanOperators? activeOperator = SmartishTable.Filters.BooleanOperators.Equals;
+  private SmartishTable.Filters.NumericOperators intPropOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.DateTimeOperators dateTimePropOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
+
+  private Dictionary<string, SmartishTableSettings> options = new Dictionary<string, SmartishTableSettings>()
+  {
+      { "Page Size 50, page 4, no sort", new SmartishTableSettings()
+      {
+        ColumnSorts = null,
+        Page = 4,
+        PageSize = 50
+      } },
+      { "Page Size 20, page 2, income ASC", new SmartishTableSettings()
+      {
+        ColumnSorts = new List<Sorts.ColumnSort>() { new Sorts.ColumnSort() { Name = "Income", SortOrder = 1 } },
+        Page = 2,
+        PageSize = 20
+      } },
+      { "Page Size 100, page 3, first ASC -> last DESC -> birth date ASC", new SmartishTableSettings()
+      {
+        ColumnSorts = new List<Sorts.ColumnSort>() {
+            new Sorts.ColumnSort() { Name = "FirstName", SortOrder = 1 },
+            new Sorts.ColumnSort() { Name = "LastName", SortOrder = 2, IsDescending = true },
+            new Sorts.ColumnSort() { Name = "BirthDate", SortOrder = 3 }
+        },
+        Page = 3,
+        PageSize = 100
+      } },
+      { "Page Size 10, page 1, Income ASC", new SmartishTableSettings()
+      {
+        ColumnSorts = new List<Sorts.ColumnSort>() {
+            new Sorts.ColumnSort() { Name = "Income", SortOrder = 1, IsDescending = false },
+        },
+        PageSize = 10
+      } },
+  };
+
+  private string? selected;
+  private int selectedMaxNumberOfSorts = 4;
+  private SmartishTableSettings settings;
+  private SmartishTableSettings initialSettings;
+  private bool eventAdded = false;
+
+  protected override async Task OnInitializedAsync()
+  {
+    initialSettings = new SmartishTableSettings()
+      {
+        ColumnSorts = new List<Sorts.ColumnSort>()
+      {
+        new Sorts.ColumnSort() { IsDescending = true, Name = "Email", SortOrder = 1}
+      },
+        PageSize = 10,
+        Page = 8
+      };
+    list = await Http.GetFromJsonAsync<List<Person>>("People");
+  }
+
+  //protected override void OnAfterRender(bool firstRender)
+  //{
+  //  if (table != null && !eventAdded)
+  //  {
+  //    table.OnDataUpdated += table_OnDataUpdated;
+  //    eventAdded = true;
+  //  }
+  //}
+
+  //private void table_OnDataUpdated(object sender, SmartishTableSettings newSettings)
+  //{
+  //  settings = newSettings;
+  //  Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(settings));
+  //}
+
+  private void table_OnDataUpdated(SmartishTableSettings newSettings)
+  {
+    settings = newSettings;
+  }
+
+  private void GetSettings()
+  {
+    settings = table?.GetSettings();
+  }
+
+  private async Task SetSettings()
+  {
+    if (string.IsNullOrEmpty(selected))
+      return;
+    await table.SetSettings(options[selected]);
+  }
+}
