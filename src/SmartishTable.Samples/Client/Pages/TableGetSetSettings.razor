@@ -3,7 +3,7 @@
 @using SmartishTable.Filters
 @inject HttpClient Http
 
-<h4>SmartishTable Samples - Get/Set settings And Initial Settings be set (Page 8, Page Size 10, Email Desc)</h4>
+<h4>SmartishTable Samples - Get/Set settings And Initial Settings set by Localstorage if present</h4>
 
 @if (list == null)
 {
@@ -18,7 +18,7 @@ else
         <select @bind=selectedMaxNumberOfSorts class="form-control">
           @foreach (var item in Enumerable.Range(1, 4))
           {
-          <option selected=@(selectedMaxNumberOfSorts == item) value=@item>@item</option>
+            <option selected=@(selectedMaxNumberOfSorts == item) value=@item>@item</option>
           }
         </select>
       </div>
@@ -203,6 +203,7 @@ else
   </SmartishTable.Root>
 }
 
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 @code {
   private List<Person> list;
   private SmartishTable.Root<Person> table;
@@ -259,36 +260,15 @@ else
 
   protected override async Task OnInitializedAsync()
   {
-    initialSettings = new SmartishTableSettings()
-      {
-        ColumnSorts = new List<Sorts.ColumnSort>()
-      {
-        new Sorts.ColumnSort() { IsDescending = true, Name = "Email", SortOrder = 1}
-      },
-        PageSize = 10,
-        Page = 8
-      };
+    if (await localStorage.ContainKeyAsync(nameof(TableGetSetSettings)))
+      initialSettings = await localStorage.GetItemAsync<SmartishTableSettings>(nameof(TableGetSetSettings));
     list = await Http.GetFromJsonAsync<List<Person>>("People");
   }
 
-  //protected override void OnAfterRender(bool firstRender)
-  //{
-  //  if (table != null && !eventAdded)
-  //  {
-  //    table.OnDataUpdated += table_OnDataUpdated;
-  //    eventAdded = true;
-  //  }
-  //}
-
-  //private void table_OnDataUpdated(object sender, SmartishTableSettings newSettings)
-  //{
-  //  settings = newSettings;
-  //  Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(settings));
-  //}
-
-  private void table_OnDataUpdated(SmartishTableSettings newSettings)
+  private async Task table_OnDataUpdated(SmartishTableSettings newSettings)
   {
     settings = newSettings;
+    await localStorage.SetItemAsync(nameof(TableGetSetSettings), settings);
   }
 
   private void GetSettings()
