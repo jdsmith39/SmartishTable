@@ -8,7 +8,7 @@ public class Paginator : BaseClass
 {
     internal static HashSet<string> PaginatorPropertiesChangedList = new HashSet<string>() { nameof(Paginator.Page), nameof(Paginator.PageSize) };
 
-    private int? pageSize;
+    internal int? pageSize;
     public int? PageSize 
     { 
         get => pageSize;

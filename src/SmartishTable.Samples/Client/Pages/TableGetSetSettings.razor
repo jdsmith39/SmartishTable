@@ -3,7 +3,7 @@
 @using SmartishTable.Filters
 @inject HttpClient Http
 
-<h2>SmartishTable Samples - Get Set settings</h2>
+<h4>SmartishTable Samples - Get/Set settings And Initial Settings be set (Page 8, Page Size 10, Email Desc)</h4>
 
 @if (list == null)
 {
@@ -11,6 +11,19 @@
 }
 else
 {
+  <div class="row mb-2">
+    <div class="col-6">
+      <div>
+        <label class="form-label">Max number of sorts</label>
+        <select @bind=selectedMaxNumberOfSorts class="form-control">
+          @foreach (var item in Enumerable.Range(1, 4))
+          {
+          <option selected=@(selectedMaxNumberOfSorts == item) value=@item>@item</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col">
       <button type="button" class="btn btn-primary" @onclick=GetSettings>Get Settings</button>
@@ -20,20 +33,20 @@ else
       </div>
     </div>
     <div class="col">
-        <div class="input-group">
-             <select @bind=selected class="form-control">
+      <div class="input-group">
+        <select @bind=selected class="form-control">
           <option>Select...</option>
           @foreach (var item in options)
-        {
-          <option value=@item.Key>@item.Key</option>
-        }
-      </select>
-      <button type="button" class="btn btn-primary" @onclick=SetSettings>Set Settings</button>
-        </div>
+          {
+            <option value=@item.Key>@item.Key</option>
+          }
+        </select>
+        <button type="button" class="btn btn-primary" @onclick=SetSettings>Set Settings</button>
+      </div>
     </div>
   </div>
 
-  <SmartishTable.Root SafeList="list" MaxNumberOfSorts="4" @ref=table>
+  <SmartishTable.Root SafeList="list" MaxNumberOfSorts="selectedMaxNumberOfSorts" @ref=table OnDataUpdated=table_OnDataUpdated InitialSettings="initialSettings">
     <table class="table table-condensed table-striped">
       <thead>
         <tr>
@@ -213,37 +226,69 @@ else
         Page = 4,
         PageSize = 50
       } },
-      { "Page Size 20, page 2, income sort", new SmartishTableSettings()
+      { "Page Size 20, page 2, income ASC", new SmartishTableSettings()
       {
         ColumnSorts = new List<Sorts.ColumnSort>() { new Sorts.ColumnSort() { Name = "Income", SortOrder = 1 } },
         Page = 2,
         PageSize = 20
       } },
-      { "Page Size 100, page 3, first sort -> last sort -> birth date sort", new SmartishTableSettings()
+      { "Page Size 100, page 3, first ASC -> last DESC -> birth date ASC", new SmartishTableSettings()
       {
         ColumnSorts = new List<Sorts.ColumnSort>() {
             new Sorts.ColumnSort() { Name = "FirstName", SortOrder = 1 },
             new Sorts.ColumnSort() { Name = "LastName", SortOrder = 2, IsDescending = true },
-            new Sorts.ColumnSort() { Name = "BirthDate", SortOrder = 3 } 
+            new Sorts.ColumnSort() { Name = "BirthDate", SortOrder = 3 }
         },
         Page = 3,
         PageSize = 100
       } },
-      { "Page Size 10, page 1, email sort", new SmartishTableSettings()
+      { "Page Size 10, page 1, Income ASC", new SmartishTableSettings()
       {
         ColumnSorts = new List<Sorts.ColumnSort>() {
-            new Sorts.ColumnSort() { Name = "Email", SortOrder = 1, IsDescending = true },
+            new Sorts.ColumnSort() { Name = "Income", SortOrder = 1, IsDescending = false },
         },
         PageSize = 10
       } },
   };
 
   private string? selected;
+  private int selectedMaxNumberOfSorts = 4;
   private SmartishTableSettings settings;
+  private SmartishTableSettings initialSettings;
+  private bool eventAdded = false;
 
   protected override async Task OnInitializedAsync()
   {
+    initialSettings = new SmartishTableSettings()
+      {
+        ColumnSorts = new List<Sorts.ColumnSort>()
+      {
+        new Sorts.ColumnSort() { IsDescending = true, Name = "Email", SortOrder = 1}
+      },
+        PageSize = 10,
+        Page = 8
+      };
     list = await Http.GetFromJsonAsync<List<Person>>("People");
+  }
+
+  //protected override void OnAfterRender(bool firstRender)
+  //{
+  //  if (table != null && !eventAdded)
+  //  {
+  //    table.OnDataUpdated += table_OnDataUpdated;
+  //    eventAdded = true;
+  //  }
+  //}
+
+  //private void table_OnDataUpdated(object sender, SmartishTableSettings newSettings)
+  //{
+  //  settings = newSettings;
+  //  Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(settings));
+  //}
+
+  private void table_OnDataUpdated(SmartishTableSettings newSettings)
+  {
+    settings = newSettings;
   }
 
   private void GetSettings()

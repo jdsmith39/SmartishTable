@@ -51,18 +51,43 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
         return this.Values.Where(w => w.SortOrder.HasValue).OrderBy(o => o.SortOrder);
     }
 
+    internal void RemoveHighestSortOrders(int maxNumberOfSorts)
+    {
+        var sortColumns = GetSortColumns();
+        if (sortColumns.Count() <= maxNumberOfSorts)
+            return;
+
+        foreach (var item in sortColumns.OrderByDescending(o => o.SortOrder))
+        {
+            if (maxNumberOfSorts < item.SortOrder!.Value)
+                item.SortOrder = null;
+            else
+                break;
+        }
+    }
+
     internal IQueryable<SmartishTItem> SetOrderBys(IQueryable<SmartishTItem> query)
     {
         var sortColumns = GetSortColumns();
         IOrderedQueryable<SmartishTItem>? orderedQuery = null;
         foreach (var item in sortColumns)
         {
-            var fieldType = ExpressionHelper.GetPropertyType(item.Field).GetNonNullableType();
-            var propertyPath = item.Field.GetPropertyName(fieldType);
-            var paramExp = Expression.Parameter(typeof(SmartishTItem), "o");
-            var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
-            var filterPropertyConverted = Expression.Convert(filterProperty, typeof(object));
-            var lambda = Expression.Lambda<Func<SmartishTItem, object>>(Expression.Condition(filterProperty.CreateNullChecks(), filterPropertyConverted, Expression.Constant(null)), paramExp);
+            Expression<Func<SmartishTItem, object>>? lambda = null;
+            // assumption is the comparer is handling nested objects if it contains them.
+            if (item.Comparer is null || true)
+            {
+                var fieldType = ExpressionHelper.GetPropertyType(item.Field)?.GetNonNullableType();
+                if (fieldType is null)
+                    throw new Exception($"{item.Field} type is null for sorting");
+                var propertyPath = item.Field.GetPropertyName(fieldType);
+                var paramExp = Expression.Parameter(typeof(SmartishTItem), "o");
+                var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
+                var filterPropertyConverted = Expression.Convert(filterProperty, typeof(object));
+                lambda = Expression.Lambda<Func<SmartishTItem, object>>(Expression.Condition(filterProperty.CreateNullChecks(), filterPropertyConverted, Expression.Constant(null)), paramExp);
+            }
+            else
+                lambda = item.Field;
+
             if (item.SortOrder == 1)
             {
                 if (item.IsDescending)
@@ -88,7 +113,7 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
 
     internal List<ColumnSort> GetSortSettings()
     {
-        return GetSortColumns().Select(s=>
+        return GetSortColumns().Select(s =>
         {
             if (string.IsNullOrEmpty(s.Name))
             {
@@ -102,12 +127,12 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
                 SortOrder = s.SortOrder,
                 Name = s.Name
             };
-            
+
             return x;
         }).ToList();
     }
 
-    internal void SetSortSettings(int maxNumberOfSorts, List<ColumnSort> columns)
+    internal void SetSortSettings(int maxNumberOfSorts, List<ColumnSort>? columns)
     {
         // clear existing sorts
         foreach (var item in Values)
@@ -130,7 +155,7 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
         foreach (var item in from v in Values
                              join c in columns on v.Name equals c.Name
                              orderby c.SortOrder
-                             select new {v, c})
+                             select new { v, c })
         {
             item.v.IsDescending = item.c.IsDescending;
             item.v.SortOrder = item.c.SortOrder;

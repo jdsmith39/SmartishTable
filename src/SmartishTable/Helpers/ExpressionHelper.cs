@@ -75,7 +75,7 @@ public static class ExpressionHelper
 
         var propertyInfo = body?.Member as PropertyInfo;
         if (propertyInfo == null)
-            throw new NotSupportedException($"{expression.Body.ToString()} is not a member expression. {expression.Body.NodeType}");
+            throw new NotSupportedException($"{expression.Body.ToString()} is not a member expression. {expression.Body.NodeType}.  This type will require a Custom IComparer and/or IFilter.");
 
         return propertyInfo.PropertyType;
     }

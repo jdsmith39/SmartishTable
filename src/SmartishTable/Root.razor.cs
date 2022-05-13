@@ -43,10 +43,10 @@ public partial class Root<SmartishTItem> : IDisposable
     public string HeaderTag { get; set; } = "th";
 
     /// <summary>
-    /// Event to listen to when data is updated
+    /// Event to listen to when data is updated and sends current configuration
     /// </summary>
     [Parameter]
-    public Func<Task>? OnDataUpdated { get; set; }
+    public EventCallback<SmartishTableSettings> OnDataUpdated { get; set; }
 
     /// <summary>
     /// Default:  1
@@ -55,28 +55,76 @@ public partial class Root<SmartishTItem> : IDisposable
     [Parameter]
     public int MaxNumberOfSorts { get; set; } = 1;
 
+    /// <summary>
+    /// Initial settings
+    /// </summary>
+    [Parameter]
+    public SmartishTableSettings? InitialSettings { get; set; }
+
     internal ColumnSortCollection<SmartishTItem> ColumnSorts = default!;
     internal ColumnFilterCollection<SmartishTItem> ColumnFilters = default!;
     internal Paginator Paginator = default!;
+    private bool maxNumberOfSortsDecreased = false;
     private bool disposedValue;
+    private readonly Type rootType = typeof(Root<SmartishTItem>);
+    private static readonly string[] ReloadTriggerParameters = new string[]
+    {
+        nameof(SafeList),
+        nameof(MaxNumberOfSorts),
+    };
 
     protected override void OnInitialized()
     {
         Paginator = new Paginator()
-        { 
-           page = 1
+        {
+            page = 1
         };
         Paginator.PropertyChanged += Paginator_PropertyChanged;
     }
 
-    protected override async Task OnParametersSetAsync()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        await Refresh();
+        var shouldReload = false;
+        var p = parameters.ToDictionary();
+
+        foreach (var item in ReloadTriggerParameters)
+        {
+            if (p.ContainsKey(item))
+            {
+                var newValue = p[item]?.GetHashCode();
+                var oldValue = rootType.GetProperty(item)!.GetValue(this)?.GetHashCode();
+
+                shouldReload = newValue != oldValue;
+
+                if (item == nameof(MaxNumberOfSorts))
+                {
+                    maxNumberOfSortsDecreased = MaxNumberOfSorts > (int)p[item];
+                }
+            }
+
+            if (shouldReload)
+            {
+                break;
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (shouldReload)
+            await Refresh();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (InitialSettings != null && firstRender)
+        {
+            await SetSettings(InitialSettings, true);
+        }
     }
 
     private async void Paginator_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if(Paginator.PaginatorPropertiesChangedList.Contains(e.PropertyName))
+        if (Paginator.PaginatorPropertiesChangedList.Contains(e.PropertyName))
             await Refresh();
     }
 
@@ -90,7 +138,7 @@ public partial class Root<SmartishTItem> : IDisposable
         {
             Page = Paginator.Page,
             PageSize = Paginator.PageSize,
-            ColumnSorts = ColumnSorts.GetSortSettings()
+            ColumnSorts = ColumnSorts?.GetSortSettings()
         };
     }
 
@@ -100,6 +148,11 @@ public partial class Root<SmartishTItem> : IDisposable
     /// <param name="settings"><see cref="SmartishTableSettings"/></param>
     public async Task SetSettings(SmartishTableSettings settings)
     {
+        await SetSettings(settings, true);
+    }
+
+    private async Task SetSettings(SmartishTableSettings settings, bool refresh)
+    {
         if (settings == null)
             return;
 
@@ -107,11 +160,12 @@ public partial class Root<SmartishTItem> : IDisposable
             ColumnSorts.SetSortSettings(MaxNumberOfSorts, settings.ColumnSorts);
 
         if (settings.PageSize.HasValue)
-            Paginator.PageSize = settings.PageSize.Value;
+            Paginator.pageSize = settings.PageSize.Value;
 
-        Paginator.Page = settings.Page ?? 1;
+        Paginator.page = settings.Page ?? 1;
 
-        await Refresh();
+        if (refresh)
+            await Refresh();
     }
 
     private List<SmartishTItem>? GetData()
@@ -125,7 +179,14 @@ public partial class Root<SmartishTItem> : IDisposable
             query = ColumnFilters.SetFilters(query);
 
         if (ColumnSorts != null)
+        {
+            if (maxNumberOfSortsDecreased)
+            {
+                ColumnSorts.RemoveHighestSortOrders(MaxNumberOfSorts);
+                maxNumberOfSortsDecreased = false;
+            }
             query = ColumnSorts.SetOrderBys(query);
+        }
 
         Paginator.Count = query.Count();
 
@@ -156,8 +217,9 @@ public partial class Root<SmartishTItem> : IDisposable
             Paginator.Page = 1;
 
         DisplayList = GetData();
-        if (OnDataUpdated != null)
-            await OnDataUpdated.Invoke();
+
+        if (OnDataUpdated.HasDelegate)
+            await OnDataUpdated.InvokeAsync(GetSettings());
 
         StateHasChanged();
     }
