@@ -73,8 +73,8 @@ internal class ColumnSortCollection<SmartishTItem> : Dictionary<string, ColumnSo
         foreach (var item in sortColumns)
         {
             Expression<Func<SmartishTItem, object>>? lambda = null;
-            // assumption is the comparer is handling nested objects if it contains them.
-            if (item.Comparer is null || true)
+            // assumption is if the comparer exists, it is handling all edge cases.
+            if (item.Comparer is null)
             {
                 var fieldType = ExpressionHelper.GetPropertyType(item.Field)?.GetNonNullableType();
                 if (fieldType is null)
