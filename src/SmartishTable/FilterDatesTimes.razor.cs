@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace SmartishTable;
 
-public partial class FilterNumeric<SmartishTItem, FilterType> : INotifyPropertyChanged, IFilter<SmartishTItem>, IDisposable
+public partial class FilterDatesTimes<SmartishTItem, FilterType> : INotifyPropertyChanged, IFilter<SmartishTItem>, IDisposable
 {
     [Parameter]
     public RenderFragment<FilterContext<FilterType>> ChildContent { get; set; }
@@ -24,12 +24,12 @@ public partial class FilterNumeric<SmartishTItem, FilterType> : INotifyPropertyC
     /// Default: Equals
     /// </summary>
     [Parameter]
-    public NumericOperators Operator
+    public DateTimeOperators Operator
     {
         get { return _operator; }
         set { SetProperty(ref _operator, value); }
     }
-    private NumericOperators _operator = NumericOperators.Equals;
+    private DateTimeOperators _operator = DateTimeOperators.Equals;
 
     public FilterContext<FilterType> Context { get; private set; }
 
@@ -47,17 +47,17 @@ public partial class FilterNumeric<SmartishTItem, FilterType> : INotifyPropertyC
         var filterParam = Expression.Constant(value);
         switch (Operator)
         {
-            case NumericOperators.Equals:
+            case DateTimeOperators.Equals:
                 return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterPropertyConverted, filterParam)), paramExp);
-            case NumericOperators.NotEquals:
+            case DateTimeOperators.NotEquals:
                 return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterPropertyConverted, filterParam)), paramExp);
-            case NumericOperators.GreaterThan:
+            case DateTimeOperators.GreaterThan:
                 return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThan(filterPropertyConverted, filterParam)), paramExp);
-            case NumericOperators.GreaterThanOrEqual:
+            case DateTimeOperators.GreaterThanOrEqual:
                 return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.GreaterThanOrEqual(filterPropertyConverted, filterParam)), paramExp);
-            case NumericOperators.LessThan:
+            case DateTimeOperators.LessThan:
                 return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThan(filterPropertyConverted, filterParam)), paramExp);
-            case NumericOperators.LessThanOrEqual:
+            case DateTimeOperators.LessThanOrEqual:
                 return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.LessThanOrEqual(filterPropertyConverted, filterParam)), paramExp);
         }
         return null;
@@ -65,9 +65,6 @@ public partial class FilterNumeric<SmartishTItem, FilterType> : INotifyPropertyC
 
     protected override void OnInitialized()
     {
-        if (!typeof(FilterType).IsNumeric())
-            throw new Exception($"{nameof(FilterType)} must be a numeric type.");
-
         // **** required for your filter to work ****
         Root.AddFilterComponent(this);
 

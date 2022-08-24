@@ -1,6 +1,6 @@
-﻿<div class="form-row">
-  <div class="col-sm-auto">
-    <div class="form-row">
+﻿<div class="row gx-2">
+  <div class="col-md-auto">
+    <div class="row gx-2">
       <div class="col-auto">
         <div class="form-control-plaintext">Display</div>
       </div>
@@ -8,46 +8,49 @@
         <select class="form-control" @bind="Paginator.PageSize">
           @foreach (var item in PageSizes)
           {
-    <option selected=@(item == Paginator.PageSize) value="@(item)">@item</option>}
+            <option selected=@(item == Paginator.PageSize) value="@(item)">@item</option>
+          }
+          <option value="">All</option>
         </select>
       </div>
     </div>
   </div>
-  <div class="col-sm text-center">
+  <div class="col-md">
     @if (Paginator.IsNextPageEnabled || Paginator.IsPreviousPageEnabled)
     {
-<nav>
-  <ul class="pagination justify-content-center mb-0">
-    <li class="page-item @(Paginator.Page == 1 ? "disabled" :"")">
-      <button type="button" class="page-link" @onclick="()=>SetPage(1)">First</button>
-    </li>
-    <li class="page-item @(Paginator.IsPreviousPageEnabled ? "" :"disabled")">
-      <button type="button" class="page-link" @onclick="()=>SetPage(Paginator.Page - 1)" aria-label="Previous">
-        <span aria-hidden="true" title="Previous">&laquo;</span>
-      </button>
-    </li>
-    <li class="page-item">
-      <div class="form-row mx-1">
-        <div class="col-auto">
-          <div class="form-control-plaintext">Page</div>
-        </div>
-        <div class="col-auto">
-          <input type="number" @bind="@currentPage" class="form-control pageWidth-form-control" />
-        </div>
-      </div>
-    </li>
-    <li class="page-item @(Paginator.IsNextPageEnabled ? "" :"disabled")">
-      <button type="button" class="page-link" @onclick="()=>SetPage(Paginator.Page + 1)" aria-label="Next">
-        <span aria-hidden="true" title="Next">&raquo;</span>
-      </button>
-    </li>
-    <li class="page-item @(Paginator.Page == Paginator.PageCount ? "disabled" :"")">
-      <button type="button" class="page-link" @onclick="()=>SetPage(Paginator.PageCount)">Last (@Paginator.PageCount)</button>
-    </li>
-  </ul>
-</nav>}
+      <nav>
+        <ul class="pagination justify-content-start justify-content-md-center mb-0">
+          <li class="page-item @(Paginator.Page == 1 ? "disabled" :"")">
+            <button type="button" class="page-link" @onclick="()=>SetPage(1)">First</button>
+          </li>
+          <li class="page-item @(Paginator.IsPreviousPageEnabled ? "" :"disabled")">
+            <button type="button" class="page-link" @onclick="()=>SetPage(Paginator.Page - 1)" aria-label="Previous">
+              <span aria-hidden="true" title="Previous">&laquo;</span>
+            </button>
+          </li>
+          <li class="page-item">
+            <div class="row gx-2 mx-1">
+              <div class="col-auto">
+                <div class="form-control-plaintext">Page</div>
+              </div>
+              <div class="col-auto">
+                <input type="number" @bind="@currentPage" class="form-control paging-input-width-form-control" />
+              </div>
+            </div>
+          </li>
+          <li class="page-item @(Paginator.IsNextPageEnabled ? "" :"disabled")">
+            <button type="button" class="page-link" @onclick="()=>SetPage(Paginator.Page + 1)" aria-label="Next">
+              <span aria-hidden="true" title="Next">&raquo;</span>
+            </button>
+          </li>
+          <li class="page-item @(Paginator.Page == Paginator.PageCount ? "disabled" :"")">
+            <button type="button" class="page-link" @onclick="()=>SetPage(Paginator.PageCount)">Last (@Paginator.PageCount)</button>
+          </li>
+        </ul>
+      </nav>
+    }
   </div>
-  <div class="col-sm-auto">
+  <div class="col-md-auto">
     <div class="form-control-plaintext">
       <em>@Paginator.PageLowerBound</em> - <em>
         @Paginator.PageUpperBound
@@ -56,43 +59,42 @@
   </div>
 </div>
 
-@code { 
+@code {
+  [Parameter]
+  public SmartishTable.Paging.Paginator Paginator { get; set; } = default!;
 
-    [Parameter]
-    public SmartishTable.Paging.Paginator Paginator { get; set; }
+  [Parameter]
+  public int? DefaultPageSize { get; set; }
 
-    [Parameter]
-    public int? DefaultPageSize { get; set; }
+  public int[] PageSizes { get; set; } = new[] { 10, 20, 50, 100 };
 
-    public int[] PageSizes { get; set; } = new[] { 10, 20, 50, 100 };
-
-    private int? currentPage
+  private int? currentPage
+  {
+    get => Paginator.Page;
+    set
     {
-      get => Paginator.Page;
-      set
-      {
-        var pageTo = value;
-        if (!value.HasValue)
-          pageTo = 1;
+      var pageTo = value;
+      if (!value.HasValue)
+        pageTo = 1;
 
-        if (value < 1)
-          pageTo = 1;
+      if (value < 1)
+        pageTo = 1;
 
-        if (value > Paginator.PageCount)
-          pageTo = Paginator.PageCount;
+      if (value > Paginator.PageCount)
+        pageTo = Paginator.PageCount;
 
-        Paginator.Page = pageTo.Value;
-      }
+      Paginator.Page = pageTo!.Value;
     }
+  }
 
-    protected override void OnInitialized()
-    {
-      Paginator.PageSize = DefaultPageSize ?? 10;
-      currentPage = Paginator.Page;
-    }
+  protected override void OnInitialized()
+  {
+    Paginator.PageSize = DefaultPageSize ?? 10;
+    currentPage = Paginator.Page;
+  }
 
-    public void SetPage(int newPage)
-    {
-      currentPage = newPage;
-    }
+  public void SetPage(int newPage)
+  {
+    currentPage = newPage;
+  }
   }

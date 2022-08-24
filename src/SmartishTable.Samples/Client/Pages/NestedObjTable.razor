@@ -1,0 +1,142 @@
+﻿@page "/nestedObjstable"
+@using SmartishTable.Samples.Shared
+@using SmartishTable.Filters
+@inject HttpClient Http
+
+<h2>SmartishTable Samples - Nested Objs Table</h2>
+
+@if (list == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <SmartishTable.Root SafeList="list">
+    <table class="table table-condensed table-striped">
+      <thead>
+        <tr>
+          <SmartishTable.Sort Field="o=>o.Id" IsDefaultSort="true" Css="canSelect">Last Name</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.IntProp" Css="canSelect">Int Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.StringProp" Css="canSelect">String Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.DateTimeProp" Css="canSelect">DateTime Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.NestedObj.IntProp" Css="canSelect">Int Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.NestedObj.StringProp" Css="canSelect">String Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.NestedObj.NestedObj.DateTimeProp" Css="canSelect">DateTime Nested Prop</SmartishTable.Sort>
+        </tr>
+        <tr>
+         <td></td>
+          <td>
+            <select @bind="intPropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.NestedObj.IntProp" Context="filterContext" Operator="intPropOperator" FilterType="decimal?">
+              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterNumeric>
+          </td>
+          <td>
+            <select @bind="stringPropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.NestedObj.StringProp" Context="filterContext" Operator="stringPropOperator">
+              <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
+          <td>
+            <select @bind="dateTimePropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.DateTimeOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterDatesTimes SmartishTItem=Person Field="x=>x.NestedObj.DateTimeProp" Context="filterContext" Operator="dateTimePropOperator" FilterType="DateTime?">
+              <input type="date" @bind-value="@filterContext.FilterValue" class="form-control form-control-sm" />
+            </SmartishTable.FilterDatesTimes>
+          </td>
+          <td>
+            <select @bind="nestedIntPropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.NestedObj.NestedObj.IntProp" Context="filterContext" Operator="nestedIntPropOperator" FilterType="decimal?">
+              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterNumeric>
+          </td>
+          <td>
+            <select @bind="nestedStringPropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.StringOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.NestedObj.NestedObj.StringProp" Context="filterContext" Operator="nestedStringPropOperator">
+              <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
+          <td>
+            <select @bind="nestedDateTimePropOperator" class="form-control form-control-sm">
+              @foreach (var item in SmartishTable.Filters.DateTimeOperators.Equals.GetList())
+              {
+                <option value="@item">@item.GetDisplayName()</option>
+              }
+            </select>
+            <SmartishTable.FilterDatesTimes SmartishTItem=Person Field="x=>x.NestedObj.NestedObj.DateTimeProp" Context="filterContext" Operator="nestedDateTimePropOperator" FilterType="DateTime?">
+              <input type="date" @bind-value="@filterContext.FilterValue" class="form-control form-control-sm" />
+            </SmartishTable.FilterDatesTimes>
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <SmartishTable.Repeater Context="row">
+          <RowTemplate>
+            <tr>
+              <td>@row.Item.Id</td>
+              <td>@row.Item.NestedObj?.IntProp</td>
+              <td>@row.Item.NestedObj?.StringProp</td>
+              <td>@row.Item.NestedObj?.DateTimeProp.ToString()</td>
+              <td>@row.Item.NestedObj?.NestedObj?.IntProp</td>
+              <td>@row.Item.NestedObj?.NestedObj?.StringProp</td>
+              <td>@row.Item.NestedObj?.NestedObj?.DateTimeProp.ToString()</td>
+            </tr>
+          </RowTemplate>
+          <EmptyTemplate>
+            <tr><td colspan="7">Nothing found</td></tr>
+          </EmptyTemplate>
+        </SmartishTable.Repeater>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="7">
+            <SmartishTable.Pagination Context="Pager">
+              <SmartishTablePager Paginator="Pager" DefaultPageSize="10"></SmartishTablePager>
+            </SmartishTable.Pagination>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </SmartishTable.Root>
+}
+
+@code {
+  private List<Person> list;
+
+  private SmartishTable.Filters.NumericOperators intPropOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.StringOperators stringPropOperator = SmartishTable.Filters.StringOperators.Contains;
+  private SmartishTable.Filters.DateTimeOperators dateTimePropOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.NumericOperators nestedIntPropOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
+  private SmartishTable.Filters.StringOperators nestedStringPropOperator = SmartishTable.Filters.StringOperators.Contains;
+  private SmartishTable.Filters.DateTimeOperators nestedDateTimePropOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
+
+  protected override async Task OnInitializedAsync()
+  {
+    list = await Http.GetFromJsonAsync<List<Person>>("People");
+  }
+
+}

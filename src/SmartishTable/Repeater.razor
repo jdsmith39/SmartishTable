@@ -1,4 +1,4 @@
-﻿@if (Root.DisplayList != null)
+﻿@if (Root.DisplayList != null && Root.DisplayList.Count > 0)
 {
   @for (int i = 0; i < Root.DisplayList.Count; i++)
   {
@@ -7,21 +7,31 @@
       Item = Root.DisplayList[i],
       Index = i
     };
-    @ChildContent(context)
+    @RowTemplate(context)
+  }
+}
+else
+{
+  if (EmptyTemplate != null)
+  {
+    @EmptyTemplate
   }
 }
 
-@typeparam TItem
+@typeparam SmartishTItem
 @code {
     [CascadingParameter(Name = "SmartishTableRoot")]
-    public Root<TItem> Root { get; set; }
+    public Root<SmartishTItem> Root { get; set; }
 
     [Parameter]
-    public RenderFragment<RepeaterContext> ChildContent { get; set; }
+    public RenderFragment<RepeaterContext> RowTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment EmptyTemplate { get; set; }
 
     public class RepeaterContext
     {
-      public TItem Item { get; set; }
+      public SmartishTItem Item { get; set; }
       public int Index { get; set; }
     }
 }

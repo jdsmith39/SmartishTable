@@ -2,100 +2,99 @@
 using SmartishTable.Filters;
 using SmartishTable.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SmartishTable
+namespace SmartishTable;
+
+public partial class FilterString<SmartishTItem> : INotifyPropertyChanged, IFilter<SmartishTItem>, IDisposable
 {
-    public partial class FilterString<TItem> : INotifyPropertyChanged, IFilter<TItem>, IDisposable
+    [Parameter]
+    public RenderFragment<FilterContext<string>> ChildContent { get; set; }
+
+    [CascadingParameter(Name = "SmartishTableRoot")]
+    public Root<SmartishTItem> Root { get; set; }
+
+    [Parameter]
+    public Expression<Func<SmartishTItem, object>> Field { get; set; }
+
+    /// <summary>
+    /// Default: Contains
+    /// </summary>
+    [Parameter]
+    public StringOperators Operator
     {
-        [Parameter]
-        public RenderFragment<FilterContext<string>> ChildContent { get; set; }
+        get { return _operator; }
+        set { SetProperty(ref _operator, value); }
+    }
+    private StringOperators _operator = StringOperators.Contains;
 
-        [CascadingParameter(Name = "SmartishTableRoot")]
-        public Root<TItem> Root { get; set; }
+    public FilterContext<string> Context { get; private set; }
 
-        [Parameter]
-        public System.Linq.Expressions.Expression<Func<TItem, object>> Field { get; set; }
-
-        /// <summary>
-        /// Default: Contains
-        /// </summary>
-        [Parameter]
-        public StringOperators Operator
-        {
-            get { return _operator; }
-            set { SetProperty(ref _operator, value); }
-        }
-        private StringOperators _operator = StringOperators.Contains;
-
-        public FilterContext<string> Context { get; private set; }
-
-        public Expression<Func<TItem, bool>> GetFilter()
-        {
-            if (string.IsNullOrEmpty(Context.FilterValue))
-                return null;
-
-            var param = Expression.Parameter(typeof(TItem), "w");
-            var filterProperty = Expression.Property(param, ExpressionHelper.GetPropertyName(Field));
-            var filterParam = Expression.Constant(Context.FilterValue);
-            switch (Operator)
-            {
-                case StringOperators.Contains:
-                case StringOperators.StartsWith:
-                case StringOperators.EndsWith:
-                    var method = typeof(string).GetMethod(Operator.ToString(), new[] { typeof(string), typeof(StringComparison) });
-                    var call = Expression.Call(filterProperty, method, filterParam, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), call), param);
-                case StringOperators.Equals:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterProperty, filterParam)), param);
-                case StringOperators.NotEquals:
-                    return Expression.Lambda<Func<TItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterProperty, filterParam)), param);
-            }
+    public virtual Expression<Func<SmartishTItem, bool>> GetFilter()
+    {
+        if (string.IsNullOrEmpty(Context.FilterValue))
             return null;
-        }
 
-        protected override void OnInitialized()
+        var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
+        var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
+        var propertyPath = Field.GetPropertyName(fieldType);
+        var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
+        var filterParam = Expression.Constant(Context.FilterValue);
+
+        switch (Operator)
         {
-            Root.AddFilterComponent(this);
-
-            Context = new FilterContext<string>();
-            Context.PropertyChanged += Context_PropertyChanged;
+            case StringOperators.Contains:
+            case StringOperators.StartsWith:
+            case StringOperators.EndsWith:
+                var method = typeof(string).GetMethod(Operator.ToString(), new[] { typeof(string), typeof(StringComparison) });
+                var call = Expression.Call(filterProperty, method, filterParam, Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), call), paramExp);
+            case StringOperators.Equals:
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterProperty, filterParam)), paramExp);
+            case StringOperators.NotEquals:
+                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterProperty, filterParam)), paramExp);
         }
+        return null;
+    }
 
-        private async void Context_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    protected override void OnInitialized()
+    {
+        // **** required for your filter to work ****
+        Root.AddFilterComponent(this);
+
+        Context = new FilterContext<string>();
+        Context.PropertyChanged += Context_PropertyChanged;
+    }
+
+    private async void Context_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        await Root.Refresh(true);
+    }
+
+    public void Dispose()
+    {
+        Context.PropertyChanged -= Context_PropertyChanged;
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    public async void RaisePropertyChange(string propertyname)
+    {
+        if (PropertyChanged != null)
         {
-            await Root.Refresh(true);
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
         }
 
-        public void Dispose()
-        {
-            Context.PropertyChanged -= Context_PropertyChanged;
-        }
+        if (propertyname == nameof(Operator) && Root != null)
+            await Root.Refresh();
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public async void RaisePropertyChange(string propertyname)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyname));
-            }
-
-            if (propertyname == nameof(Operator) && Root != null)
-                await Root.Refresh();
-        }
-
-        protected bool SetProperty<T>(ref T prop, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (object.Equals(prop, value)) return false;
-            prop = value;
-            this.RaisePropertyChange(propertyName);
-            return true;
-        }
+    protected bool SetProperty<T>(ref T prop, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (object.Equals(prop, value)) return false;
+        prop = value;
+        this.RaisePropertyChange(propertyName);
+        return true;
     }
 }

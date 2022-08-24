@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace SmartishTable.Interfaces
+namespace SmartishTable.Interfaces;
+
+public interface IFilter<SmartishTItem>
 {
-    public interface IFilter<TItem>
-    {
-        Expression<Func<TItem, bool>> GetFilter();
-    }
+    Expression<Func<SmartishTItem, bool>> GetFilter();
 }
