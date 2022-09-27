@@ -75,7 +75,7 @@ public partial class Sort<SmartishTItem>
 
         if (IsDefaultSort)
         {
-            Root.ColumnSorts[key].SortOrder = DefaultSorOrder;
+            Root.ColumnSorts[key].SortOrder = DefaultSortOrder;
             Root.ColumnSorts[key].IsDescending = StartingSortDescending;
         }
 
