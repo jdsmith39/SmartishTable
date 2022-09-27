@@ -29,7 +29,7 @@ public partial class Sort<SmartishTItem>
     /// Default Sort Order.  Defaults to 1.  Subsequent Defaults should be incremented 2, 3, 4, etc.
     /// </summary>
     [Parameter]
-    public int DefaultSorOrder { get; set; } = 1;
+    public int DefaultSortOrder { get; set; } = 1;
 
     [Parameter]
     public bool StartingSortDescending { get; set; } = false;
