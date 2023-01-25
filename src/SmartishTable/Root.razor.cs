@@ -16,7 +16,10 @@ public partial class Root<SmartishTItem> : IDisposable
     [Parameter]
     public List<SmartishTItem> SafeList { get; set; } = default!;
 
-    internal List<SmartishTItem>? DisplayList { get; set; }
+    /// <summary>
+    /// Contains the filtered/sorted displaylist.  Only contains current displayed page.
+    /// </summary>
+    public List<SmartishTItem>? DisplayList { get; internal set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; } = default!;

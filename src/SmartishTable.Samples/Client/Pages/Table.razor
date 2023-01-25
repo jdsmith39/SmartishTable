@@ -11,7 +11,7 @@
 }
 else
 {
-  <SmartishTable.Root SafeList="list" MaxNumberOfSorts="2">
+  <SmartishTable.Root SafeList="list" MaxNumberOfSorts="2" @ref=smartishTable>
     <table class="table table-condensed table-striped">
       <thead>
         <tr>
@@ -207,6 +207,9 @@ else
             </SmartishTable.FilterDatesTimes>
           </td>
         </tr>
+        <tr>
+            <td colspan="16">Filtered List Income Total:  @smartishTable?.DisplayList.Sum(s=>s.Income)</td>
+        </tr>
       </thead>
       <tbody>
         <SmartishTable.Repeater Context="row">
@@ -249,6 +252,8 @@ else
 
 @code {
   private List<Person> list;
+
+  private SmartishTable.Root<Person> smartishTable;
 
   private SmartishTable.Filters.StringOperators lastNameOperator = SmartishTable.Filters.StringOperators.Contains;
   private SmartishTable.Filters.StringOperators firstNameOperator = SmartishTable.Filters.StringOperators.Contains;
