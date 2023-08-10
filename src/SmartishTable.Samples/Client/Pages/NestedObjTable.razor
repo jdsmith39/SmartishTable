@@ -22,6 +22,8 @@ else
           <SmartishTable.Sort Field="o=>o.NestedObj.NestedObj.IntProp" Css="canSelect">Int Nested Prop</SmartishTable.Sort>
           <SmartishTable.Sort Field="o=>o.NestedObj.NestedObj.StringProp" Css="canSelect">String Nested Prop</SmartishTable.Sort>
           <SmartishTable.Sort Field="o=>o.NestedObj.NestedObj.DateTimeProp" Css="canSelect">DateTime Nested Prop</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.StringFields[0]" Comparer="new StringComparer()" Css="canSelect">String Field 1</SmartishTable.Sort>
+          <SmartishTable.Sort Field="o=>o.StringFields[1]" Comparer="new StringComparer()" Css="canSelect">String Field 2</SmartishTable.Sort>
         </tr>
         <tr>
          <td></td>
@@ -91,6 +93,20 @@ else
               <input type="date" @bind-value="@filterContext.FilterValue" class="form-control form-control-sm" />
             </SmartishTable.FilterDatesTimes>
           </td>
+          <td>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.StringFields[0]"
+                                        FilterOverride="(String fv) => (Person item) => item.StringFields[0].Contains(fv)"
+                                        Context="filterContext" Operator="nestedStringPropOperator">
+                <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
+          <td>
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.StringFields[1]"
+                                        FilterOverride="(String fv) => (Person item) => item.StringFields[1].Contains(fv)"
+                                        Context="filterContext" Operator="nestedStringPropOperator">
+                <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
+            </SmartishTable.FilterString>
+          </td>
         </tr>
       </thead>
       <tbody>
@@ -104,6 +120,8 @@ else
               <td>@row.Item.NestedObj?.NestedObj?.IntProp</td>
               <td>@row.Item.NestedObj?.NestedObj?.StringProp</td>
               <td>@row.Item.NestedObj?.NestedObj?.DateTimeProp.ToString()</td>
+              <td>@row.Item.StringFields[0]</td>
+              <td>@row.Item.StringFields[1]</td>
             </tr>
           </RowTemplate>
           <EmptyTemplate>
@@ -139,4 +157,19 @@ else
     list = await Http.GetFromJsonAsync<List<Person>>("People");
   }
 
+    public class StringComparer : IComparer<object?>
+    {
+        public int Compare(object? xx, object? yy)
+        {
+            if (xx == null && yy == null)
+                return 0;
+
+            if (xx == null && yy != null)
+                return 1;
+            if (xx != null && yy == null)
+                return -1;
+
+            return string.Compare((string)xx, (string)yy);
+        }
+    }
 }
