@@ -30,12 +30,21 @@ public partial class FilterString<SmartishTItem> : INotifyPropertyChanged, IFilt
     }
     private StringOperators _operator = StringOperators.Contains;
 
+    /// <summary>
+    /// This will ignore the Operator parameter if set
+    /// </summary>
+    [Parameter]
+    public Func<string, Expression<Func<SmartishTItem, bool>>>? FilterOverride { get; set; }
+    
     public FilterContext<string> Context { get; private set; }
 
     public virtual Expression<Func<SmartishTItem, bool>> GetFilter()
     {
         if (string.IsNullOrEmpty(Context.FilterValue))
             return null;
+
+        if (FilterOverride != null)
+            return FilterOverride(Context.FilterValue);
 
         var fieldType = ExpressionHelper.GetPropertyType(Field).GetNonNullableType();
         var paramExp = Expression.Parameter(typeof(SmartishTItem), "w");
