@@ -1,4 +1,4 @@
-﻿@page "/virtualizetable"
+﻿@page "/virtualizedtable"
 @using SmartishTable.Samples.Shared
 @using SmartishTable.Filters
 @inject HttpClient Http
@@ -11,10 +11,10 @@
 }
 else
 {
-  <SmartishTable.Root SafeList="list" MaxNumberOfSorts="2" @ref=smartishTable>
+  <SmartishTable.Root SafeList="list" @ref=smartishTable>
     <table class="table table-condensed table-striped">
       <thead>
-        <tr>
+        <tr class="sticky-top bg-light">
           <SmartishTable.Sort Field="o=>o.LastName" IsDefaultSort="true" Css="canSelect">Last Name</SmartishTable.Sort>
           <SmartishTable.Sort Field="o=>o.FirstName" Css="canSelect">First Name</SmartishTable.Sort>
           <SmartishTable.Sort Field="o=>o.Email" Css="canSelect">Email</SmartishTable.Sort>
@@ -149,15 +149,6 @@ else
             <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.Income" Context="filterContext" Operator="incomeOperator1" FilterType="decimal?">
               <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
             </SmartishTable.FilterNumeric>
-            <select @bind="incomeOperator2" class="form-control form-control-sm">
-              @foreach (var item in SmartishTable.Filters.NumericOperators.Equals.GetList())
-              {
-                <option value="@item">@item.GetDisplayName()</option>
-              }
-            </select>
-            <SmartishTable.FilterNumeric SmartishTItem="Person" Field="x=>x.Income" Context="filterContext" Operator="incomeOperator2" FilterType="decimal?">
-              <input type="number" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" class="form-control form-control-sm" />
-            </SmartishTable.FilterNumeric>
           </td>
           <td>
             <select @bind="activeOperator" class="form-control form-control-sm">
@@ -170,13 +161,10 @@ else
             <SmartishTable.FilterBoolean Field="o=>o.IsActive" Operator="activeOperator"></SmartishTable.FilterBoolean>
           </td>
         </tr>
-        <tr>
-            <td colspan="16">Filtered List Income Total:  @smartishTable?.DisplayList.Sum(s=>s.Income)</td>
-        </tr>
       </thead>
       <tbody>
         <Virtualize Context="row" Items="smartishTable.DisplayList" ItemSize="100" OverscanCount="10">
-            <tr style="height: 99px;">
+            <tr style="height: 99px;" @key=row.Id>
               <td>@row.LastName</td>
               <td>@row.FirstName</td>
               <td>@row.Email</td>
@@ -192,15 +180,6 @@ else
             </tr>
         </Virtualize>
       </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="12">
-            <SmartishTable.Pagination Context="Pager">
-              <SmartishTablePager Paginator="Pager" DefaultPageSize="null"></SmartishTablePager>
-            </SmartishTable.Pagination>
-          </td>
-        </tr>
-      </tfoot>
     </table>
   </SmartishTable.Root>
 }
@@ -221,7 +200,6 @@ else
   private SmartishTable.Filters.StringOperators cityOperator = SmartishTable.Filters.StringOperators.Contains;
   private SmartishTable.Filters.DateTimeOperators birthDateOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
   private SmartishTable.Filters.NumericOperators incomeOperator1 = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
-  private SmartishTable.Filters.NumericOperators incomeOperator2 = SmartishTable.Filters.NumericOperators.LessThanOrEqual;
   private SmartishTable.Filters.BooleanOperators? activeOperator = SmartishTable.Filters.BooleanOperators.Equals;
   private SmartishTable.Filters.NumericOperators intPropOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
   private SmartishTable.Filters.StringOperators stringPropOperator = SmartishTable.Filters.StringOperators.Contains;

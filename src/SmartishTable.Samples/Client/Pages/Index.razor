@@ -10,16 +10,18 @@
 }
 else
 {
+    <span>CRUD buttons</span>
     <button type="button" @onclick=AddRange>Add 3</button>
   <button type="button" @onclick=Add1>Add 1</button>
-  <button type="button" @onclick=Update1st>Update 1st</button>
-  <button type="button" @onclick=Delete1st>Delete 1st</button>
+  <button type="button" @onclick=Update1st>Update Repeater Index 0</button>
+  <button type="button" @onclick=Delete1st>Delete Repeater Index 0</button>
   <SmartishTable.Root SafeList="list" HeaderTag="div" @ref=smartishTable>
+    <h4>Sorts</h4>
     <div class="form-row">
-      <SmartishTable.Sort Field="o=>o.LastName" IsDefaultSort="true" Css="col-md-4 canSelect">Last Name</SmartishTable.Sort>
-      <SmartishTable.Sort Field="o=>o.FirstName" Css="col-md-4 canSelect">First Name</SmartishTable.Sort>
-      <SmartishTable.Sort Field="o=>o.Email" Css="col-md-4 canSelect">Email</SmartishTable.Sort>
-      <SmartishTable.Repeater Context="row">
+      <SmartishTable.Sort Field="o=>o.LastName" IsDefaultSort=true Css="col-md-4 canSelect hover">Last Name</SmartishTable.Sort>
+      <SmartishTable.Sort Field="o=>o.FirstName" Css="col-md-4 canSelect hover">First Name</SmartishTable.Sort>
+      <SmartishTable.Sort Field="o=>o.Email" Css="col-md-4 canSelect hover">Email</SmartishTable.Sort>
+      <SmartishTable.Repeater Context="row" @ref=repeater>
           <RowTemplate>
         <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-2">
           <div class="card h-100">
@@ -50,6 +52,7 @@ else
 @code {
   private List<Person> list;
   private SmartishTable.Root<Person> smartishTable;
+  private SmartishTable.Repeater<Person> repeater;
 
   protected override async Task OnInitializedAsync()
   {
@@ -58,7 +61,7 @@ else
 
   private Task AddRange()
   {
-    var asdf = list.Take(3).SerializeJson().DeserializeJson<IEnumerable<Person>>();
+    var asdf = smartishTable.DisplayList.Take(3).SerializeJson().DeserializeJson<IEnumerable<Person>>();
     foreach (var item in asdf)
     {
       item.FirstName = "Add Range";
@@ -68,7 +71,7 @@ else
 
   private Task Add1()
   {
-    var item = list.FirstOrDefault();
+    var item = smartishTable.DisplayList.FirstOrDefault();
     if (item != null)
       return smartishTable.Add(item.SerializeJson().DeserializeJson<Person>());
     return Task.CompletedTask;
@@ -76,13 +79,12 @@ else
 
   private Task Update1st()
   {
-    var item = list.FirstOrDefault();
+    var item = smartishTable.DisplayList.FirstOrDefault();
     if (item == null)
       return Task.CompletedTask;
-    //item = item.SerializeJson().DeserializeJson<Person>();
+    item = item.SerializeJson().DeserializeJson<Person>();
     item.FirstName = "Updated";
-    //return smartishTable.UpdateAt(0, item);    
-    return Task.CompletedTask;
+    return smartishTable.UpdateAt(0, item);    
   }
 
   private Task Delete1st()
