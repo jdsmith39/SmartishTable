@@ -17,6 +17,7 @@ Not dependent on any CSS framework.
 - Fully customizable UI
 	- No UI framework dependency
 - Paging
+- Added support for the Virtualize component
 - Sorting
 	- Support for IComparer (example included)
 - Filtering
@@ -24,16 +25,19 @@ Not dependent on any CSS framework.
 	- DateTimes (Equals, Not Equals, >, >=, <, <=)
 	- Numbers (Equals, Not Equals, >, >=, <, <=)
 	- Strings (Contains, StartsWith, EndsWith, Equals, Not Equals)
+		- Added Filter override for built-in string filter.  This will ignore the operator if not used in the override.
 	- Custom (Create a component that implements IFilter<TItem> and off you go!)
 		- example included!
 - Included examples:
-	- Simple example of cards with sorting.
+	- Simple example of cards with sorting and CRUD buttons.
 	- Regular Table with lots of data and sorting/filtering and max number of sorts being 2
 	- Parameter based auto refreshing
 	- Custom Filter
 	- Dynamic Columns using a dictionary.
 		- Custom Comparer
 	- Nested objects with sorting and filtering
+		- Contains an example of a fitler override
 	- Get/Set configuration settings (for now, this is page #, page size, and sorting info), so the settings can be stored in localstorage (or somewhere else) and reloaded on next visit.
 		- also shows how to use the OnDataUpdated eventCallback which also sends back the current configuration settings.
 		- Binding Max Number of Sorts so it can be changed on the fly
+	- Virtualized Table example
