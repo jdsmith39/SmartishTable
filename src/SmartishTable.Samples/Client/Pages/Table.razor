@@ -61,7 +61,7 @@ else
                 <option value="@item">@item.GetDisplayName()</option>
               }
             </select>
-            <SmartishTable.FilterString IsCaseSensitive SmartishTItem=Person Field="x=>x.Email" Context="filterContext" Operator="emailOperator">
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.Email" Context="filterContext" Operator="emailOperator">
               <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" name="Search" class="form-control form-control-sm" />
             </SmartishTable.FilterString>
           </td>
