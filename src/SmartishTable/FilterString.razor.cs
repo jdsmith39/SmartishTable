@@ -30,6 +30,9 @@ public partial class FilterString<SmartishTItem> : INotifyPropertyChanged, IFilt
     }
     private StringOperators _operator = StringOperators.Contains;
 
+    [Parameter]
+    public bool IsCaseSensitive { get; set; }
+
     public FilterContext<string> Context { get; private set; }
 
     public virtual Expression<Func<SmartishTItem, bool>> GetFilter()
@@ -43,21 +46,39 @@ public partial class FilterString<SmartishTItem> : INotifyPropertyChanged, IFilt
         var filterProperty = ExpressionHelper.GetLastMemberExpression(propertyPath, paramExp);
         var filterParam = Expression.Constant(Context.FilterValue);
 
+        var methodCall = GetMethodCallByOperator(filterProperty, filterParam, IsCaseSensitive);
+
+        if (methodCall == null)
+            return null;
+
+        return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), methodCall), paramExp);
+    }
+
+    private Expression GetMethodCallByOperator(Expression filterProperty, ConstantExpression filterParam, bool isCaseSensitive)
+    {
         switch (Operator)
         {
             case StringOperators.Contains:
             case StringOperators.StartsWith:
             case StringOperators.EndsWith:
-                var method = typeof(string).GetMethod(Operator.ToString(), new[] { typeof(string), typeof(StringComparison) });
-                var call = Expression.Call(filterProperty, method, filterParam, Expression.Constant(StringComparison.OrdinalIgnoreCase));
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), call), paramExp);
             case StringOperators.Equals:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.Equal(filterProperty, filterParam)), paramExp);
+                var method = typeof(string).GetMethod(Operator.ToString(), new[] { typeof(string), typeof(StringComparison) });
+                return Expression.Call(filterProperty, method, filterParam, Expression.Constant(GetCaseSensitiveComparisonType(isCaseSensitive)));
+
             case StringOperators.NotEquals:
-                return Expression.Lambda<Func<SmartishTItem, bool>>(Expression.AndAlso(filterProperty.CreateNullChecks(), Expression.NotEqual(filterProperty, filterParam)), paramExp);
+                var notEqualsMethod = typeof(string).GetMethod(StringOperators.Equals.ToString(), new[] { typeof(string), typeof(StringComparison) });
+                var equalsCall = Expression.Call(filterProperty, notEqualsMethod, filterParam, Expression.Constant(GetCaseSensitiveComparisonType(isCaseSensitive)));
+                return Expression.Not(equalsCall);
         }
+
         return null;
     }
+
+    private StringComparison GetCaseSensitiveComparisonType(bool isCaseSensitive)
+    {
+        return isCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+    }
+
 
     protected override void OnInitialized()
     {
