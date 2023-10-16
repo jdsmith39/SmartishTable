@@ -19,13 +19,14 @@ Not dependent on any CSS framework.
 - Paging
 - Added support for the Virtualize component
 - Sorting
-	- Support for IComparer (example included)
+	- If complex sorting is needed, there is support for IComparer. (example included)
 - Filtering
 	- Boolean (Equals, Not Equals, Is True, Is False)
 	- DateTimes (Equals, Not Equals, >, >=, <, <=)
 	- Numbers (Equals, Not Equals, >, >=, <, <=)
 	- Strings (Contains, StartsWith, EndsWith, Equals, Not Equals)
 		- Added Filter override for built-in string filter.  This will ignore the operator if not used in the override.
+		- IsCaseSensitive parameter added for whether you want case sensitivity or not.  Example on Table page
 	- Custom (Create a component that implements IFilter<TItem> and off you go!)
 		- example included!
 - Included examples:
