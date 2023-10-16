@@ -11,6 +11,12 @@
 }
 else
 {
+    <div>
+        <label>
+      <input type="checkbox" @bind-value=LastNameIsCaseSensitive />
+      Last Name is case sensitive
+        </label>
+        </div>
   <SmartishTable.Root SafeList="list" MaxNumberOfSorts="2" @ref=smartishTable>
     <table class="table table-condensed table-striped">
       <thead>
@@ -39,7 +45,7 @@ else
                 <option value="@item">@item.GetDisplayName()</option>
               }
             </select>
-            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.LastName" Context="filterContext" Operator="lastNameOperator">
+            <SmartishTable.FilterString SmartishTItem=Person Field="x=>x.LastName" Context="filterContext" Operator="lastNameOperator" IsCaseSensitive=LastNameIsCaseSensitive>
               <input type="text" @bind-value="@filterContext.FilterValue" @bind-value:event="oninput" name="Search" class="form-control form-control-sm" />
             </SmartishTable.FilterString>
           </td>
@@ -271,6 +277,8 @@ else
   private SmartishTable.Filters.NumericOperators intPropOperator = SmartishTable.Filters.NumericOperators.GreaterThanOrEqual;
   private SmartishTable.Filters.StringOperators stringPropOperator = SmartishTable.Filters.StringOperators.Contains;
   private SmartishTable.Filters.DateTimeOperators dateTimePropOperator = SmartishTable.Filters.DateTimeOperators.GreaterThanOrEqual;
+
+  private bool LastNameIsCaseSensitive;
 
   protected override async Task OnInitializedAsync()
   {
