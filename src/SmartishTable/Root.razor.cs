@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using SmartishTable.Filters;
 using SmartishTable.Interfaces;
 using SmartishTable.Paging;
@@ -41,6 +42,7 @@ public partial class Root<SmartishTItem> : IDisposable
 
   /// <summary>
   /// Default: th
+  /// Use to change what the "Sort" component builds out
   /// </summary>
   [Parameter]
   public string HeaderTag { get; set; } = "th";
@@ -78,15 +80,21 @@ public partial class Root<SmartishTItem> : IDisposable
 
   protected override void OnInitialized()
   {
+    logger.LogDebug($"{nameof(OnInitialized)} called.");
     Paginator = new Paginator()
     {
-      page = 1
+      page = 1,
+      // set to 0 initially so all data won't be rendered before the real pageSize is set within the Paginator context.
+      pageSize = 0
     };
     Paginator.PropertyChanged += Paginator_PropertyChanged;
+
+    logger.LogDebug($"{nameof(OnInitialized)} end.");
   }
 
   public override async Task SetParametersAsync(ParameterView parameters)
   {
+    logger.LogDebug($"{nameof(SetParametersAsync)} called.");
     var shouldReload = false;
     var p = parameters.ToDictionary();
 
@@ -115,20 +123,30 @@ public partial class Root<SmartishTItem> : IDisposable
 
     if (shouldReload)
       await Refresh();
+
+    logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Should Reload:" + shouldReload);
   }
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
+    logger.LogDebug($"{nameof(OnAfterRenderAsync)} called.  InitialSettings != null && firstRender: " + (InitialSettings != null && firstRender));
     if (InitialSettings != null && firstRender)
     {
       await SetSettings(InitialSettings, true);
     }
+    // if PageSize is still 0 then it hasn't be set by the developer, set it to null to show everything.
+    if (Paginator.PageSize == 0)
+      Paginator.PageSize = null;
+    logger.LogDebug($"{nameof(OnAfterRenderAsync)} ended.");
   }
 
   private async void Paginator_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
+    logger.LogDebug($"{nameof(Paginator_PropertyChanged)} called. Property Name: " + e.PropertyName);
     if (Paginator.PaginatorPropertiesChangedList.Contains(e.PropertyName))
       await Refresh();
+
+    logger.LogDebug($"{nameof(Paginator_PropertyChanged)} ended.");
   }
 
   /// <summary>
@@ -137,6 +155,7 @@ public partial class Root<SmartishTItem> : IDisposable
   /// <returns><see cref="SmartishTableSettings"/></returns>
   public SmartishTableSettings GetSettings()
   {
+    logger.LogDebug($"{nameof(GetSettings)} called.");
     return new SmartishTableSettings()
     {
       Page = Paginator.Page,
@@ -151,7 +170,9 @@ public partial class Root<SmartishTItem> : IDisposable
   /// <param name="settings"><see cref="SmartishTableSettings"/></param>
   public async Task SetSettings(SmartishTableSettings settings)
   {
+    logger.LogDebug($"{nameof(SetSettings)} called.");
     await SetSettings(settings, true);
+    logger.LogDebug($"{nameof(SetSettings)} ended.");
   }
 
   private async Task SetSettings(SmartishTableSettings settings, bool refresh)
@@ -173,6 +194,7 @@ public partial class Root<SmartishTItem> : IDisposable
 
   private List<SmartishTItem>? GetData()
   {
+    logger.LogDebug($"{nameof(GetData)} callled.");
     if (SafeList == null)
       return null;
 
@@ -196,6 +218,7 @@ public partial class Root<SmartishTItem> : IDisposable
     if (Paginator.PageSize.HasValue)
       query = query.Skip(Paginator.PageSize.Value * (Paginator.Page - 1)).Take(Paginator.PageSize.Value);
 
+    logger.LogDebug($"{nameof(GetData)} ended.");
     return query.ToList();
   }
 
@@ -205,9 +228,11 @@ public partial class Root<SmartishTItem> : IDisposable
   /// <param name="filterComponent"><see cref="IFilter{SmartishTItem}"/></param>
   public void AddFilterComponent(IFilter<SmartishTItem> filterComponent)
   {
+    logger.LogDebug($"{nameof(AddFilterComponent)} called.");
     if (ColumnFilters == null)
       ColumnFilters = new ColumnFilterCollection<SmartishTItem>();
     ColumnFilters.Add(filterComponent);
+    logger.LogDebug($"{nameof(AddFilterComponent)} ended.");
   }
 
   /// <summary>
@@ -216,6 +241,7 @@ public partial class Root<SmartishTItem> : IDisposable
   /// <param name="resetPaging">resets the page to page 1</param>
   public async Task Refresh(bool resetPaging = false)
   {
+    logger.LogDebug($"{nameof(Refresh)} called.  resetPaging: {{resetPaging}}", resetPaging);
     if (resetPaging)
       Paginator.Page = 1;
 
@@ -225,6 +251,8 @@ public partial class Root<SmartishTItem> : IDisposable
       await OnDataUpdated.InvokeAsync(GetSettings());
 
     StateHasChanged();
+
+    logger.LogDebug($"{nameof(Refresh)} ended.");
   }
 
   /// <summary>

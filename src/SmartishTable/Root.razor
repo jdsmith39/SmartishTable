@@ -1,5 +1,7 @@
-﻿@attribute [CascadingTypeParameter(nameof(SmartishTItem))]
+﻿
+@attribute [CascadingTypeParameter(nameof(SmartishTItem))]
 @typeparam SmartishTItem
+@inject ILogger<Root<SmartishTItem>> logger
 
 <CascadingValue Value="this" Name="SmartishTableRoot">
   <CascadingValue Value="this.Paginator" Name="SmartishTablePager">
