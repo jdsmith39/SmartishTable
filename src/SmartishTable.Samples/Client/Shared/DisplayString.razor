@@ -1,0 +1,11 @@
+﻿@Value
+
+@code {
+  [Parameter]
+  public string? Value { get; set; }
+
+  protected override void OnParametersSet()
+  {
+    Console.WriteLine(nameof(OnParametersSet));
+  }
+}

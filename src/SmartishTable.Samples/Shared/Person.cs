@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SmartishTable.Samples.Shared
@@ -29,6 +30,10 @@ namespace SmartishTable.Samples.Shared
                     };
                 }
             }
+
+            StringFields = new List<string>();
+            StringFields.Add(Guid.NewGuid().ToString());
+            StringFields.Add(Guid.NewGuid().ToString());
         }
 
         public int Id { get; set; }
@@ -47,6 +52,8 @@ namespace SmartishTable.Samples.Shared
         public decimal? Income { get; set; }
 
         public Nested NestedObj { get; set; }
+
+        public List<string> StringFields { get; set; }
 
         public string GetRandomString(int length)
         {
