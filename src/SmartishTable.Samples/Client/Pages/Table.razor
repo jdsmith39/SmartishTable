@@ -214,14 +214,14 @@ else
           </td>
         </tr>
         <tr>
-            <td colspan="16">Filtered List Income Total:  @smartishTable?.DisplayList.Sum(s=>s.Income)</td>
+          <td colspan="16">Display List Income Total:  @smartishTable?.DisplayList.Sum(s => s.Income)?.ToString("C")</td>
         </tr>
       </thead>
       <tbody>
         <SmartishTable.Repeater Context="row">
           <RowTemplate>
             <tr>
-              <td>@row.Item.LastName</td>
+              <td><DisplayString Value="@row.Item.LastName"/></td>
               <td>@row.Item.FirstName</td>
               <td>@row.Item.Email</td>
               <td>@row.Item.Gender</td>
