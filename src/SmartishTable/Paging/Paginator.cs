@@ -30,7 +30,7 @@ public class Paginator : BaseClass
         {
             if (!PageSize.HasValue)
                 return 1;
-            return (int)Math.Ceiling((double)Count / (double)PageSize.Value);
+            return (int)Math.Ceiling((double)Count / (double)PageSize!.Value);
         }
     }
 

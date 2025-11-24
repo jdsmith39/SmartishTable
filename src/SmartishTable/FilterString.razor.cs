@@ -12,13 +12,13 @@ namespace SmartishTable;
 public partial class FilterString<SmartishTItem> : INotifyPropertyChanged, IFilter<SmartishTItem>, IDisposable
 {
   [Parameter]
-  public RenderFragment<FilterContext<string>> ChildContent { get; set; }
+  public RenderFragment<FilterContext<string>> ChildContent { get; set; } = default!;
 
   [CascadingParameter(Name = "SmartishTableRoot")]
-  public Root<SmartishTItem> Root { get; set; }
+  public Root<SmartishTItem> Root { get; set; } = default!;
 
-  [Parameter]
-  public Expression<Func<SmartishTItem, object>> Field { get; set; }
+  [Parameter, EditorRequired]
+  public Expression<Func<SmartishTItem, object>> Field { get; set; } = default!;
 
   /// <summary>
   /// Default: Contains
