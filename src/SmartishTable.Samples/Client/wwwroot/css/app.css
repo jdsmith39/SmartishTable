@@ -61,3 +61,10 @@ a, .btn-link {
 .paging-input-width-form-control {
     width: 80px;
 }
+
+.unsorted::before {
+    display: inline-block;
+    width: .8rem;
+    margin-right: .2rem;
+    content: url(unsorted.svg)
+}

@@ -15,7 +15,7 @@ else
   <button type="button" @onclick=Add1>Add 1</button>
   <button type="button" @onclick=Update1st>Update Repeater Index 0</button>
   <button type="button" @onclick=Delete1st>Delete Repeater Index 0</button>
-  <SmartishTable.Root SafeList="list" HeaderTag="div" @ref=smartishTable>
+  <SmartishTable.Root SafeList="list" HeaderTag="div" @ref=smartishTable NoSortCss="unsorted">
     <h4>Sorts</h4>
     <div class="form-row">
       <SmartishTable.Sort Field="o=>o.LastName" IsDefaultSort="true" Css="col-md-4 canSelect hover">Last Name</SmartishTable.Sort>
