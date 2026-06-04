@@ -2,7 +2,7 @@
 {
   @for (int i = 0; i < Root.DisplayList.Count; i++)
   {
-    var context = new RepeaterContext()
+    var context = new RepeaterContext<SmartishTItem>()
     {
       Item = Root.DisplayList[i],
       Index = i
@@ -24,14 +24,8 @@ else
     public Root<SmartishTItem> Root { get; set; }
 
     [Parameter]
-    public RenderFragment<RepeaterContext> RowTemplate { get; set; }
+    public RenderFragment<RepeaterContext<SmartishTItem>> RowTemplate { get; set; }
 
     [Parameter]
     public RenderFragment EmptyTemplate { get; set; }
-
-    public class RepeaterContext
-    {
-      public SmartishTItem Item { get; set; }
-      public int Index { get; set; }
-    }
 }

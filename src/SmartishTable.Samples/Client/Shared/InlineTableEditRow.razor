@@ -1,0 +1,15 @@
+@using SmartishTable.Samples.Shared
+<tr>
+  <td><EditText @bind-Value="@row.Item.LastName" /></td>
+  <td><EditText @bind-Value="@row.Item.FirstName" /></td>
+  <td><EditText @bind-Value="@row.Item.Email" /></td>
+  <td><EditText @bind-Value="@row.Item.Gender" /></td>
+  <td>@row.Item.Dependents</td>
+  <td><EditText @bind-Value="@row.Item.Company" /></td>
+  <td><EditText @bind-Value="@row.Item.JobTitle" /></td>
+</tr>
+
+@code {
+  [Parameter]
+  public RepeaterContext<Person> row { get; set; }
+}

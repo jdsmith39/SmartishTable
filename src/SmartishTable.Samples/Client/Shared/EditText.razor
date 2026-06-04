@@ -1,0 +1,49 @@
+﻿@using Microsoft.Extensions.Logging
+@inherits InputBase<string>
+@inject ILogger<EditText> logger
+<div class="">
+  <input @bind="CurrentValue" @bind:event="oninput" id="@($"{_predicate}{nameSuffix}")" type="text" class="form-control @CssClass" />
+</div>
+
+@code {
+  private string? _predicate;
+
+  private string nameSuffix = Guid.NewGuid().ToString();
+  private string? _previousValue;
+
+  protected override void OnInitialized()
+  {
+    _predicate = Guid.NewGuid().ToString();
+  }
+
+  public override async Task SetParametersAsync(ParameterView parameters)
+  {
+    logger.LogDebug($"{nameof(SetParametersAsync)} called.");
+    await base.SetParametersAsync(parameters);
+  }
+
+  protected override void OnParametersSet()
+  {
+    logger.LogDebug($"{nameof(OnParametersSet)} called.");
+  }
+
+  protected override bool ShouldRender()
+  {
+    if (_previousValue != CurrentValue)
+    {
+      logger.LogDebug($"{nameof(ShouldRender)}: Value changed from '{_previousValue}' to '{CurrentValue}'. Rendering.");
+      _previousValue = CurrentValue;
+      return true;
+    }
+
+    logger.LogDebug($"{nameof(ShouldRender)}: Value unchanged ('{CurrentValue}'). Skipping render.");
+    return false;
+  }
+
+  protected override bool TryParseValueFromString(string value, out string result, out string? validationErrorMessage)
+  {
+    result = value;
+    validationErrorMessage = null;
+    return true;
+  }
+}

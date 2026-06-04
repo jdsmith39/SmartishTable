@@ -95,7 +95,7 @@ public partial class Root<SmartishTItem> : IDisposable
   public override async Task SetParametersAsync(ParameterView parameters)
   {
     logger.LogDebug($"{nameof(SetParametersAsync)} called.");
-    var shouldReload = false;
+    var shouldRender = false;
     var p = parameters.ToDictionary();
 
     foreach (var item in ReloadTriggerParameters)
@@ -105,7 +105,7 @@ public partial class Root<SmartishTItem> : IDisposable
         var newValue = p[item]?.GetHashCode();
         var oldValue = rootType.GetProperty(item)!.GetValue(this)?.GetHashCode();
 
-        shouldReload = newValue != oldValue;
+        shouldRender = newValue != oldValue;
 
         if (item == nameof(MaxNumberOfSorts))
         {
@@ -113,7 +113,7 @@ public partial class Root<SmartishTItem> : IDisposable
         }
       }
 
-      if (shouldReload)
+      if (shouldRender)
       {
         break;
       }
@@ -121,15 +121,31 @@ public partial class Root<SmartishTItem> : IDisposable
 
     await base.SetParametersAsync(parameters);
 
-    if (shouldReload)
+    if (shouldRender)
       await Refresh();
 
-    logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Should Reload:" + shouldReload);
+    logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Should Reload: {shouldRender}");
+  }
+
+  private int? oldDisplayListHashCode;
+  private bool shouldRender;
+  protected override bool ShouldRender()
+  {
+    var newHashCode = DisplayList?.GetHashCode();
+
+    if (oldDisplayListHashCode != newHashCode)
+    {
+      oldDisplayListHashCode = newHashCode;
+      shouldRender = true;
+    }
+
+    logger.LogDebug($"{nameof(ShouldRender)} call ended. Should Render: {shouldRender}");
+    return shouldRender;
   }
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    logger.LogDebug($"{nameof(OnAfterRenderAsync)} called.  InitialSettings != null && firstRender: " + (InitialSettings != null && firstRender));
+    logger.LogDebug($"{nameof(OnAfterRenderAsync)} called.  InitialSettings != null && firstRender: {(InitialSettings != null && firstRender)}");
     if (InitialSettings != null && firstRender)
     {
       await SetSettings(InitialSettings, true);
@@ -142,7 +158,7 @@ public partial class Root<SmartishTItem> : IDisposable
 
   private async void Paginator_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
-    logger.LogDebug($"{nameof(Paginator_PropertyChanged)} called. Property Name: " + e.PropertyName);
+    logger.LogDebug($"{nameof(Paginator_PropertyChanged)} called. Property Name: {e.PropertyName}");
     if (Paginator.PaginatorPropertiesChangedList.Contains(e.PropertyName))
       await Refresh();
 
@@ -319,8 +335,10 @@ public partial class Root<SmartishTItem> : IDisposable
   /// </summary>
   /// <param name="index">index of the displayed item (index is provided by the repeater context)</param>
   /// <returns><see cref="SmartishTItem"/></returns>
-  public SmartishTItem GetAt(int index)
+  public SmartishTItem? GetAt(int index)
   {
+    if (DisplayList == null)
+      return default;
     return DisplayList[index];
   }
 
@@ -330,7 +348,7 @@ public partial class Root<SmartishTItem> : IDisposable
     {
       if (disposing)
       {
-        Paginator.PropertyChanged -= Paginator_PropertyChanged;
+        Paginator.PropertyChanged -= Paginator_PropertyChanged!;
       }
 
       disposedValue = true;
