@@ -5,6 +5,7 @@
 
 <h2>SmartishTable Samples - Table</h2>
 
+
 @if (list == null)
 {
   <p><em>Loading...</em></p>
@@ -18,6 +19,12 @@ else
         </label>
         </div>
   <SmartishTable.Root SafeList="list" MaxNumberOfSorts="2" @ref=smartishTable>
+    <br />
+    <div class="alert alert-info">
+        @* Example of filtered list in use *@
+        @(smartishTable?.FilteredList?.Count() ?? 0) Items in the filtered List
+    </div>
+    <br />
     <table class="table table-condensed table-striped">
       <thead>
         <tr>
@@ -255,6 +262,7 @@ else
     </table>
   </SmartishTable.Root>
 }
+
 
 @code {
   private List<Person> list;

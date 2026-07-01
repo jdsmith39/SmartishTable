@@ -216,7 +216,7 @@ public partial class Root<SmartishTItem> : IDisposable
 
   private List<SmartishTItem>? GetData()
   {
-    logger.LogDebug($"{nameof(GetData)} callled.");
+    logger.LogDebug($"{nameof(GetData)} called.");
     if (SafeList == null)
       return null;
 
