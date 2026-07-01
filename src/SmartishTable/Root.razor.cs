@@ -22,6 +22,12 @@ public partial class Root<SmartishTItem> : IDisposable
   /// </summary>
   public List<SmartishTItem>? DisplayList { get; internal set; }
 
+  /// <summary>
+  /// Contains the filtered/sorted list.  Contains all items that match the current filters and sorts.
+  /// Only available if using client side paging
+  /// </summary>
+  public IQueryable<SmartishTItem>? FilteredList { get; internal set; }
+
   [Parameter]
   public RenderFragment ChildContent { get; set; } = default!;
 
@@ -230,6 +236,10 @@ public partial class Root<SmartishTItem> : IDisposable
     }
 
     Paginator.Count = query.Count();
+
+    //Make a copy of the query before paging is implemented
+    //Kept as a query so that it is not realized until the user enumerates it.  This is important for large datasets.
+    FilteredList = query.AsQueryable();
 
     if (Paginator.PageSize.HasValue)
       query = query.Skip(Paginator.PageSize.Value * (Paginator.Page - 1)).Take(Paginator.PageSize.Value);
