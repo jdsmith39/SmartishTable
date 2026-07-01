@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SmartishTable.Samples.Shared;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -53,7 +54,8 @@ namespace SmartishTable.Samples.Server.Controllers
         {
             if (people != null)
                 return;
-            var json = await System.IO.File.ReadAllTextAsync("data.json");
+            var path = Path.Combine(AppContext.BaseDirectory, "data.json");
+            var json = await System.IO.File.ReadAllTextAsync(path);
             people = System.Text.Json.JsonSerializer.Deserialize<List<Person>>(json);
         }
     }
