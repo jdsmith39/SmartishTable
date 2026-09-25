@@ -1,4 +1,20 @@
-﻿@if (Root.DisplayList != null && Root.DisplayList.Count > 0)
+﻿@using Microsoft.AspNetCore.Components.Web.Virtualization
+@if (Virtualize)
+{
+  <Virtualize Items="@Root.DisplayList" Context="item" OverscanCount="@VirtualizationOverscanCount">
+    <ItemContent>
+      @{
+        var context = new RepeaterContext<SmartishTItem>()
+        {
+          Item = item,
+          Index = -1 // Index is not available in Virtualize, so we set it to -1 or you can implement a different logic to track the index if needed
+        };
+        @RowTemplate(context)
+      }
+    </ItemContent>
+  </Virtualize>
+}
+else if (Root.DisplayList != null && Root.DisplayList.Count > 0)
 {
   @for (int i = 0; i < Root.DisplayList.Count; i++)
   {
@@ -20,12 +36,26 @@ else
 
 @typeparam SmartishTItem
 @code {
-    [CascadingParameter(Name = "SmartishTableRoot")]
-    public Root<SmartishTItem> Root { get; set; }
+  [CascadingParameter(Name = "SmartishTableRoot")]
+  public Root<SmartishTItem> Root { get; set; }
 
-    [Parameter]
-    public RenderFragment<RepeaterContext<SmartishTItem>> RowTemplate { get; set; }
+  [Parameter]
+  public RenderFragment<RepeaterContext<SmartishTItem>> RowTemplate { get; set; }
 
-    [Parameter]
-    public RenderFragment EmptyTemplate { get; set; }
+  [Parameter]
+  public RenderFragment EmptyTemplate { get; set; }
+
+  /// <summary>
+  /// Virtualizes the list of items for performance optimization. When set to true, the component will use the Virtualize component to render only the visible items in the viewport.
+  /// Index is not available in Virtualize, so we set it to -1 or you can implement a different logic to track the index if needed
+  /// </summary>
+  [Parameter]
+  public bool Virtualize { get; set; }
+
+  /// <summary>
+  /// Overscan count for virtualization. This determines how many additional items are rendered outside the visible viewport to improve scrolling performance. 
+  /// The default value is 3.
+  /// </summary>
+  [Parameter]
+  public int VirtualizationOverscanCount { get; set; } = 3;
 }
