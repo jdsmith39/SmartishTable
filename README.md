@@ -41,4 +41,5 @@ Not dependent on any CSS framework.
 	- Get/Set configuration settings (for now, this is page #, page size, and sorting info), so the settings can be stored in localstorage (or somewhere else) and reloaded on next visit.
 		- also shows how to use the OnDataUpdated eventCallback which also sends back the current configuration settings.
 		- Binding Max Number of Sorts so it can be changed on the fly
-	- Virtualized Table example
+	- Virtualization is now built-into the SmartishTable.Repeater.  It is optional and can be turned on/off with a parameter.  All attributes for virtualize attribute can be passed through to the Virtualize component.
+	    - There is an example of using the virtualize component with a custom filter and sorting.
