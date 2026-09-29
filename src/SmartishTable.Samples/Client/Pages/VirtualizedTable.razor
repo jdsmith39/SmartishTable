@@ -3,7 +3,7 @@
 @using SmartishTable.Filters
 @inject HttpClient Http
 
-<h2>SmartishTable Samples - Virtualized Table</h2>
+<h2>SmartishTable Samples - Virtualized Table @list?.Count</h2>
 
 @if (list == null)
 {
@@ -163,7 +163,7 @@ else
         </tr>
       </thead>
       <tbody>
-        <SmartishTable.Repeater Virtualize="true" VirtualizationOverscanCount="10" Context="row">
+        <SmartishTable.Repeater Virtualize="root => root.DisplayList != null && root.DisplayList.Count > 100" VirtualizationOverscanCount="10" Context="row">
           <RowTemplate>
             <tr @key=row.Item.Id>
               <td>@row.Item.LastName</td>
@@ -210,6 +210,7 @@ else
   protected override async Task OnInitializedAsync()
   {
     list = await Http.GetFromJsonAsync<List<Person>>("People");
+    list.AddRange(list);
   }
 
 }

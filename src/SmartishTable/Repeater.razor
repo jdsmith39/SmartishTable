@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Web.Virtualization
-@if (Virtualize)
+@if (Virtualize != null && Virtualize(Root))
 {
-  <Virtualize Items="@Root.DisplayList" Context="item" OverscanCount="@VirtualizationOverscanCount">
+  <Virtualize Items="@Root.DisplayList" Context="item" SpacerElement="@SpacerElement" OverscanCount="@OverscanCount" ItemSize="@ItemSize" @attributes="AdditionalAttributes">
     <ItemContent>
       @{
         var context = new RepeaterContext<SmartishTItem>()
@@ -37,25 +37,37 @@ else
 @typeparam SmartishTItem
 @code {
   [CascadingParameter(Name = "SmartishTableRoot")]
-  public Root<SmartishTItem> Root { get; set; }
+  public Root<SmartishTItem> Root { get; set; } = default!;
 
   [Parameter]
-  public RenderFragment<RepeaterContext<SmartishTItem>> RowTemplate { get; set; }
+  public RenderFragment<RepeaterContext<SmartishTItem>> RowTemplate { get; set; } = default!;
 
   [Parameter]
-  public RenderFragment EmptyTemplate { get; set; }
+  public RenderFragment? EmptyTemplate { get; set; }
 
   /// <summary>
-  /// Virtualizes the list of items for performance optimization. When set to true, the component will use the Virtualize component to render only the visible items in the viewport.
+  /// Used with Virtualization, default 50
+  /// </summary>
+  [Parameter] public float ItemSize { get; set; } = 50;
+  /// <summary>
+  /// Used with Virtualization, default 3.
+  /// </summary>
+  [Parameter] public int OverscanCount { get; set; } = 3;
+  /// <summary>
+  /// Used with Virtualization
+  /// </summary>
+  [Parameter] public string? SpacerElement { get; set; }
+
+  /// <summary>
+  /// Additional attributes for Virtualization component.
+  /// </summary>
+  [Parameter(CaptureUnmatchedValues = true)]
+  public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+  /// <summary>
+  /// Determines whether to use Virtualize or not. If this function returns true, Virtualize will be used; otherwise, the standard rendering will be used.
   /// Index is not available in Virtualize, so we set it to -1 or you can implement a different logic to track the index if needed
   /// </summary>
   [Parameter]
-  public bool Virtualize { get; set; }
-
-  /// <summary>
-  /// Overscan count for virtualization. This determines how many additional items are rendered outside the visible viewport to improve scrolling performance. 
-  /// The default value is 3.
-  /// </summary>
-  [Parameter]
-  public int VirtualizationOverscanCount { get; set; } = 3;
+  public Func<Root<SmartishTItem>, bool>? Virtualize { get; set; }
 }
