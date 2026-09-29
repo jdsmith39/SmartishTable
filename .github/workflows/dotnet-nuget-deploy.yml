@@ -1,46 +1,48 @@
-name: NuGet-Deploy
+name: NuGet Deploy
 
 on:
   workflow_dispatch:
-    branches:
-      - main
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.gitignore'
-      - '**/*.gitattributes'
 
-env: 
-    NUGET_KEY: ${{ secrets.NUGET_API_KEY }}
+env:
+  NUGET_KEY: ${{ secrets.NUGET_API_KEY }}
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: getxml
-      id: getxml
-      uses: mavrosxristoforos/get-xml-info@1.0
-      with:
-        xml-file: './src/SmartishTable/SmartishTable.csproj'
-        xpath: '//Project//PropertyGroup//Version'
-    - name: Set VERSION variable from tag
-      run: echo "VERSION=${{steps.getxml.outputs.info}}" >> $GITHUB_ENV
-    - name: Echo Version
-      run: echo "${VERSION}"
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 10.0.x
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: Pack
-      run: dotnet pack --configuration Release /p:Version=$VERSION src/SmartishTable/SmartishTable.csproj --output .
-    - name: Push
-      run: dotnet nuget push SmartishTable.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Read Version from csproj
+        id: getxml
+        uses: mavrosxristoforos/get-xml-info@2.2.1
+        with:
+          xml-file: ./src/SmartishTable/SmartishTable.csproj
+          xpath: //Project//PropertyGroup//Version
+
+      - name: Set Version
+        run: echo "VERSION=${{ steps.getxml.outputs.info }}" >> $GITHUB_ENV
+
+      - name: Echo Version
+        run: echo "$VERSION"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack src/SmartishTable/SmartishTable.csproj --configuration Release --no-build -p:Version=$VERSION --output ./artifacts
+
+      - name: Publish to NuGet
+        run: dotnet nuget push "./artifacts/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY --skip-duplicate
