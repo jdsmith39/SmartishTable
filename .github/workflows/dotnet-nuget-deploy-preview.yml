@@ -20,7 +20,7 @@ jobs:
 
       - name: Read Version from csproj
         id: getxml
-        uses: mavrosxristoforos/get-xml-info@2
+        uses: mavrosxristoforos/get-xml-info@2.2.1
         with:
           xml-file: ./src/SmartishTable/SmartishTable.csproj
           xpath: //Project//PropertyGroup//Version
