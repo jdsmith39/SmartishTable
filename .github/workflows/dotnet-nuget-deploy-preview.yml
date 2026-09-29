@@ -47,15 +47,7 @@ jobs:
         run: dotnet test --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack \
-            src/SmartishTable/SmartishTable.csproj \
-            --configuration Release \
-            --no-build \
-            -p:Version=$VERSION \
-            --output ./artifacts
+        run: dotnet pack src/SmartishTable/SmartishTable.csproj --configuration Release --no-build -p:Version=$VERSION --output ./artifacts
 
       - name: Publish to NuGet
-        run: dotnet nuget push "./artifacts/*.nupkg" \
-            --source https://api.nuget.org/v3/index.json \
-            --api-key $NUGET_KEY \
-            --skip-duplicate
+        run: dotnet nuget push "./artifacts/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY --skip-duplicate
