@@ -17,6 +17,7 @@ Not dependent on any CSS framework.
 - Fully customizable UI
 	- No UI framework dependency
 - Paging
+- Virtualization
 - Added support for the Virtualize component
 - Sorting
 	- If complex sorting is needed, there is support for IComparer. (example included)

@@ -127,25 +127,26 @@ public partial class Root<SmartishTItem> : IDisposable
 
     await base.SetParametersAsync(parameters);
 
-    if (shouldRender)
-      await Refresh();
-
     logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Should Reload: {shouldRender}");
   }
 
-  private int? oldDisplayListHashCode;
-  private bool shouldRender;
+  private int? previousHashCode;
   protected override bool ShouldRender()
   {
-    var newHashCode = DisplayList?.GetHashCode();
+    var hash = new HashCode();
+    hash.Add(DisplayList);
+    hash.Add(ChildContent);
+    hash.Add(SortAscendingCss, StringComparer.Ordinal);
+    hash.Add(SortDescendingCss, StringComparer.Ordinal);
+    hash.Add(NoSortCss, StringComparer.Ordinal);
+    hash.Add(UseSortCss);
+    hash.Add(HeaderTag, StringComparer.Ordinal);
 
-    if (oldDisplayListHashCode != newHashCode)
-    {
-      oldDisplayListHashCode = newHashCode;
-      shouldRender = true;
-    }
-
-    logger.LogDebug($"{nameof(ShouldRender)} call ended. Should Render: {shouldRender}");
+    var currentRenderStateHashCode = hash.ToHashCode();
+    var shouldRender = previousHashCode != currentRenderStateHashCode;
+    logger.LogDebug("{Method} called. Should render: {ShouldRender}; previous hash: {PreviousHash}; current hash: {CurrentHash}",
+      nameof(ShouldRender), shouldRender, previousHashCode, currentRenderStateHashCode);
+    previousHashCode = currentRenderStateHashCode;
     return shouldRender;
   }
 
