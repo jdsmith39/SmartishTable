@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components.Web.Virtualization
-@if (Virtualize != null && Virtualize(Root))
+@if (Virtualize != null && Virtualize(Root) && Root.DisplayList != null && Root.DisplayList.Count > 0)
 {
   <Virtualize Items="@Root.DisplayList" Context="item" SpacerElement="@SpacerElement" OverscanCount="@OverscanCount" ItemSize="@ItemSize" @attributes="AdditionalAttributes">
     <ItemContent>
