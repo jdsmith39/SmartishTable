@@ -101,7 +101,7 @@ public partial class Root<SmartishTItem> : IDisposable
   public override async Task SetParametersAsync(ParameterView parameters)
   {
     logger.LogDebug($"{nameof(SetParametersAsync)} called.");
-    var shouldRender = false;
+    var refreshData = false;
     var p = parameters.ToDictionary();
 
     foreach (var item in ReloadTriggerParameters)
@@ -111,23 +111,22 @@ public partial class Root<SmartishTItem> : IDisposable
         var newValue = p[item]?.GetHashCode();
         var oldValue = rootType.GetProperty(item)!.GetValue(this)?.GetHashCode();
 
-        shouldRender = newValue != oldValue;
+        refreshData = newValue != oldValue || refreshData;
 
         if (item == nameof(MaxNumberOfSorts))
         {
           maxNumberOfSortsDecreased = MaxNumberOfSorts > (int)p[item];
         }
       }
-
-      if (shouldRender)
-      {
-        break;
-      }
     }
 
+    // must happen before the refreshData check because the parameters need to be set before the refresh occurs.
     await base.SetParametersAsync(parameters);
 
-    logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Should Reload: {shouldRender}");
+    if (refreshData)
+      await SilentRefresh();
+
+    logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Refresh Data: {refreshData}");
   }
 
   private int? previousHashCode;
@@ -160,16 +159,13 @@ public partial class Root<SmartishTItem> : IDisposable
     // if PageSize is still 0 then it hasn't be set by the developer, set it to null to show everything.
     if (Paginator.PageSize == 0)
       Paginator.PageSize = null;
-    logger.LogDebug($"{nameof(OnAfterRenderAsync)} ended.");
   }
 
   private async void Paginator_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
   {
     logger.LogDebug($"{nameof(Paginator_PropertyChanged)} called. Property Name: {e.PropertyName}");
-    if (Paginator.PaginatorPropertiesChangedList.Contains(e.PropertyName))
+    if (Paginator.PaginatorPropertiesChangedList.Contains(e.PropertyName!))
       await Refresh();
-
-    logger.LogDebug($"{nameof(Paginator_PropertyChanged)} ended.");
   }
 
   /// <summary>
@@ -217,7 +213,7 @@ public partial class Root<SmartishTItem> : IDisposable
 
   private List<SmartishTItem>? GetData()
   {
-    logger.LogDebug($"{nameof(GetData)} called.");
+    logger.LogDebug($"{nameof(GetData)} called. maxNumberOfSortsDecreased: {maxNumberOfSortsDecreased}, Paginator.Page: {Paginator.Page}, Paginator.PageSize: {Paginator.PageSize}");
     if (SafeList == null)
       return null;
 
@@ -245,7 +241,6 @@ public partial class Root<SmartishTItem> : IDisposable
     if (Paginator.PageSize.HasValue)
       query = query.Skip(Paginator.PageSize.Value * (Paginator.Page - 1)).Take(Paginator.PageSize.Value);
 
-    logger.LogDebug($"{nameof(GetData)} ended.");
     return query.ToList();
   }
 
@@ -255,20 +250,29 @@ public partial class Root<SmartishTItem> : IDisposable
   /// <param name="filterComponent"><see cref="IFilter{SmartishTItem}"/></param>
   public void AddFilterComponent(IFilter<SmartishTItem> filterComponent)
   {
-    logger.LogDebug($"{nameof(AddFilterComponent)} called.");
-    if (ColumnFilters == null)
-      ColumnFilters = new ColumnFilterCollection<SmartishTItem>();
+    logger.LogDebug($"{nameof(AddFilterComponent)} called. {filterComponent?.GetType().Name}");
+    ColumnFilters ??= new ColumnFilterCollection<SmartishTItem>();
     ColumnFilters.Add(filterComponent);
-    logger.LogDebug($"{nameof(AddFilterComponent)} ended.");
   }
 
   /// <summary>
-  /// Refreshes smartish table by getting data again
+  /// Refreshes smartish table by getting data again and calling StateHasChanged
   /// </summary>
   /// <param name="resetPaging">resets the page to page 1</param>
   public async Task Refresh(bool resetPaging = false)
   {
-    logger.LogDebug($"{nameof(Refresh)} called.  resetPaging: {{resetPaging}}", resetPaging);
+    await SilentRefresh(resetPaging);
+
+    StateHasChanged();
+  }
+
+  /// <summary>
+  /// Refreshes smartish table by getting data again, but does NOT call StateHasChanged.
+  /// </summary>
+  /// <param name="resetPaging">resets the page to page 1</param>
+  public async Task SilentRefresh(bool resetPaging = false)
+  {
+    logger.LogDebug($"{nameof(Refresh)} called.  resetPaging: {resetPaging}");
     if (resetPaging)
       Paginator.Page = 1;
 
@@ -276,10 +280,6 @@ public partial class Root<SmartishTItem> : IDisposable
 
     if (OnDataUpdated.HasDelegate)
       await OnDataUpdated.InvokeAsync(GetSettings());
-
-    StateHasChanged();
-
-    logger.LogDebug($"{nameof(Refresh)} ended.");
   }
 
   /// <summary>
