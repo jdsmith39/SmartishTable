@@ -44,5 +44,13 @@ jobs:
       - name: Pack
         run: dotnet pack src/SmartishTable/SmartishTable.csproj --configuration Release --no-build -p:Version=$VERSION --output ./artifacts
 
-      - name: Publish to NuGet
-        run: dotnet nuget push "./artifacts/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY --skip-duplicate
+      # Get a short-lived NuGet API key
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }} # Recommended: use a secret like ${{ secrets.NUGET_USER }} for your nuget.org username (profile name), NOT your email address
+    
+      # Push the package
+      - name: NuGet push
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
