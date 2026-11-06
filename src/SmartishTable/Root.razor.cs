@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SmartishTable;
@@ -129,24 +130,10 @@ public partial class Root<SmartishTItem> : IDisposable
     logger.LogDebug($"{nameof(SetParametersAsync)} call ended. Refresh Data: {refreshData}");
   }
 
-  private int? previousHashCode;
   protected override bool ShouldRender()
   {
-    var hash = new HashCode();
-    hash.Add(DisplayList);
-    hash.Add(ChildContent);
-    hash.Add(SortAscendingCss, StringComparer.Ordinal);
-    hash.Add(SortDescendingCss, StringComparer.Ordinal);
-    hash.Add(NoSortCss, StringComparer.Ordinal);
-    hash.Add(UseSortCss);
-    hash.Add(HeaderTag, StringComparer.Ordinal);
-
-    var currentRenderStateHashCode = hash.ToHashCode();
-    var shouldRender = previousHashCode != currentRenderStateHashCode;
-    logger.LogDebug("{Method} called. Should render: {ShouldRender}; previous hash: {PreviousHash}; current hash: {CurrentHash}",
-      nameof(ShouldRender), shouldRender, previousHashCode, currentRenderStateHashCode);
-    previousHashCode = currentRenderStateHashCode;
-    return shouldRender;
+    logger.LogDebug("{Method} called. Should render: {ShouldRender} (shouldRender is always true)", nameof(ShouldRender), true);
+    return true;
   }
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
